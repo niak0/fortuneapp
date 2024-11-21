@@ -71,8 +71,8 @@ Thumbs.db
 
 # Firebase yapılandırma
 lib/firebase_options.dart
-ios/firebase_app_id_file.json
-ios/Runner.xcodeproj/project.pbxproj
+lib/build/
+ios/firebase_app_id_
 firebase.json
 
 # iOS/Android yapılandırma
