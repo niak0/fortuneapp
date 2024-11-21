@@ -2,6 +2,9 @@
 
 Fortune App, kullanıcılara çeşitli fal bakma deneyimleri sunan bir Flutter uygulamasıdır.
 
+Proje product'a çıkmak üzere geliştirilmişti. Acelece mock datalar ile değiştirip github'a attım bazı hatalar mevcut.
+
+
 ## Özellikler
 
 - 🔮 Tarot falı
