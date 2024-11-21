@@ -1,0 +1,1 @@
+ /Users/okanerdincarslan/AndroidStudioProjects/fortuneapp/.dart_tool/flutter_build/b0370ea0056c7e934c6f7b41fc2086f8/native_assets.yaml: 
