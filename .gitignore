@@ -1,0 +1,80 @@
+# Gizli bilgiler ve API Anahtarları
+.env
+.env.*
+!.env.example
+**/google-services.json
+**/GoogleService-Info.plist
+**/secrets.dart
+**/keys.dart
+**/config.dart
+**/firebase-debug.log
+**/firebase-debug.*.log
+**/firebase-debug-*.log
+**/ui-debug.log
+**/database-debug.log
+**/pubsub-debug.log
+
+# iOS hassas bilgileri
+**/xcuserdata/
+*.xcworkspace/
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+*.xccheckout
+*.moved-aside
+*.xcuserstate
+*.xcscmblueprint
+xcuserdata/
+
+# Firebase Functions
+functions/node_modules/
+functions/.env
+functions/*.log
+.firebase/
+.firebaserc
+firebase-debug.log
+database-debug.log
+ui-debug.log
+
+# Diğer hassas bilgiler
+*.p12
+*.mobileprovision
+*.cer
+*.certSigningRequest
+*.p7s
+*.pfx
+*.pem
+*.crt
+*.key
+*.keystore
+*.jks
+key.properties
+upload-keystore.jks
+local.properties
+
+# Geçici dosyalar ve loglar
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.DS_Store
+Thumbs.db
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Firebase yapılandırma
+lib/firebase_options.dart
+ios/firebase_app_id_file.json
+ios/Runner.xcodeproj/project.pbxproj
+firebase.json
+
+# iOS/Android yapılandırma
+ios/Runner.xcodeproj/project.pbxproj
+android/app/build.gradle
