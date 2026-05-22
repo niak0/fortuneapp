@@ -20,10 +20,10 @@ dependencies:
 
   #tarih format
   intl: ^0.19.0
-  google_fonts: ^6.2.1
+  google_fonts: ^8.1.0
 
   #picker and animation
-  image_picker: ^1.1.2
+  image_picker: ^1.2.2
   lottie: ^3.1.2
 
   #network
@@ -31,12 +31,13 @@ dependencies:
 
   #storage
   shared_preferences: ^2.3.2
+  firebase_core: ^4.9.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  flutter_lints: ^5.0.0
+  flutter_lints: ^6.0.0
 
 flutter:
 

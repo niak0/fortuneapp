@@ -4,7 +4,6 @@ import '../../../enums/zodiac_sign.dart';
 import '../user_setup_view_model.dart';
 
 class ZodiacStep extends StatelessWidget {
-
   const ZodiacStep({super.key});
 
   @override

@@ -1,0 +1,22 @@
+{
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@upstash/context7-mcp@latest"
+      ]
+    },
+    "firebase": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@gannonh/firebase-mcp"
+      ],
+      "env": {
+        "FIREBASE_STORAGE_BUCKET": "quicklearn-3c6e4.firebasestorage.app",
+        "SERVICE_ACCOUNT_KEY_PATH": "/Volumes/Okantosh/projects/golmakinesifortune/falamazing-firebase-adminsdk-fbsvc-ab21c442c3.json"
+      }
+    }
+  }
+}

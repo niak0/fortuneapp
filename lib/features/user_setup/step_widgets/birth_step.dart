@@ -93,10 +93,10 @@ class _BirthStepState extends State<BirthStep> {
             title: const Text('Doğum saatimi bilmiyorum'),
             value: viewModel.isChecked,
             onChanged: (value) {
-                viewModel.toggleChecked(value!);
-                if (value) {
-                  birthTimeController.clear();
-                }
+              viewModel.toggleChecked(value!);
+              if (value) {
+                birthTimeController.clear();
+              }
             },
           ),
         ],

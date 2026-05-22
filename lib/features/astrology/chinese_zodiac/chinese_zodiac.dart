@@ -20,11 +20,31 @@ class ChineseZodiac extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
         child: Column(
           children: [
-            Card(child: ListTile(title: const Text("Hayvan"),trailing: Text(animal.turkishName),)),
-            Card(child: ListTile(title: const Text("Astral Element"),trailing: Text(animal.element),)),
-            Card(child: ListTile(title: const Text("Yönetici Gezegen"),trailing: Text(animal.rulingPlanet),)),
-            Card(child: ListTile(title: const Text("Uğurlu Sayılar"),trailing: Text(animal.luckyNumbers.join(', ')),)),
-            Card(child: ListTile(title: const Text("Taşları"),trailing: Text(animal.luckyStones.join(', ')),)),
+            Card(
+                child: ListTile(
+              title: const Text("Hayvan"),
+              trailing: Text(animal.turkishName),
+            )),
+            Card(
+                child: ListTile(
+              title: const Text("Astral Element"),
+              trailing: Text(animal.element),
+            )),
+            Card(
+                child: ListTile(
+              title: const Text("Yönetici Gezegen"),
+              trailing: Text(animal.rulingPlanet),
+            )),
+            Card(
+                child: ListTile(
+              title: const Text("Uğurlu Sayılar"),
+              trailing: Text(animal.luckyNumbers.join(', ')),
+            )),
+            Card(
+                child: ListTile(
+              title: const Text("Taşları"),
+              trailing: Text(animal.luckyStones.join(', ')),
+            )),
           ],
         ),
       ),

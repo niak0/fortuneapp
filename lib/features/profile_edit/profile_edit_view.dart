@@ -95,9 +95,7 @@ class _ProfileEditViewState extends State<ProfileEditView> {
                           firstDate: DateTime(1950),
                           lastDate: DateTime.now(),
                         );
-                        if (pickedDate != null) {
-                          viewModel.updateUser(birthDate: pickedDate);
-                        }
+                        viewModel.updateUser(birthDate: pickedDate);
                       },
                     ),
                     TextField(

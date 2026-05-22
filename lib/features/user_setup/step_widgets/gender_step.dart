@@ -5,8 +5,7 @@ import 'package:provider/provider.dart';
 import '../user_setup_view_model.dart';
 
 class GenderStep extends StatelessWidget {
-  const GenderStep({
-    super.key});
+  const GenderStep({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -17,18 +16,20 @@ class GenderStep extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-           Text(
+          Text(
             "Cinsiyetini Seç:",
             style: Theme.of(context).textTheme.headlineSmall,
           ),
           const SizedBox(height: 20),
           Row(
-            children: GenderEnum.values.map((gender) => GenderOption(
-                  title: gender.turkishName,
-                  isSelected: viewModel.user.gender == gender.name,
-                  icon: gender.icon,
-                  onTap: () => viewModel.updateUser(gender: gender.name),
-                )).toList(),
+            children: GenderEnum.values
+                .map((gender) => GenderOption(
+                      title: gender.turkishName,
+                      isSelected: viewModel.user.gender == gender.name,
+                      icon: gender.icon,
+                      onTap: () => viewModel.updateUser(gender: gender.name),
+                    ))
+                .toList(),
           ),
           const SizedBox(height: 20),
           GestureDetector(
@@ -46,7 +47,7 @@ class GenderStep extends StatelessWidget {
                   },
                   activeColor: Theme.of(context).colorScheme.secondary,
                 ),
-                 Text(
+                Text(
                   'LGBTQ',
                   style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 18),
                 ),
@@ -124,7 +125,7 @@ enum GenderEnum {
         print("Türkçe karşılık var, Türkçe değeri döndürülüyor.");
       }
       return GenderEnum.values.firstWhere(
-            (sign) => sign.name.toLowerCase() == apiValue.toLowerCase(),
+        (sign) => sign.name.toLowerCase() == apiValue.toLowerCase(),
       );
     } catch (e) {
       if (kDebugMode) {

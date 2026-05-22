@@ -6,7 +6,6 @@ import '../user_setup_view_model.dart';
 class RelationshipStep extends StatelessWidget {
   const RelationshipStep({super.key});
 
-
   @override
   Widget build(BuildContext context) {
     final UserSetupViewModel viewModel = context.watch<UserSetupViewModel>();

@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../user_setup_view_model.dart';
 
-
 class NameStep extends StatelessWidget {
-   NameStep({super.key});
+  NameStep({super.key});
   final TextEditingController _controller = TextEditingController();
 
   @override
@@ -16,7 +15,8 @@ class NameStep extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text("Öncelikle seni tanıyalım.",
+          const Text(
+            "Öncelikle seni tanıyalım.",
             style: TextStyle(
               color: Colors.white,
               fontSize: 20,

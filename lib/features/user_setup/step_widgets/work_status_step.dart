@@ -16,7 +16,7 @@ class WorkStatusStep extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-           Text(
+          Text(
             "Çalışma durumun nedir?",
             style: theme.textTheme.headlineSmall,
           ),
