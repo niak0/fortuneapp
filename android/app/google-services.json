@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "930180621512",
+    "project_id": "falamazing",
+    "storage_bucket": "falamazing.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:930180621512:android:dcc5f7ee96d534bf10f1fd",
+        "android_client_info": {
+          "package_name": "com.fatihglmk.nasip"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAHhnbK08s3D-XF17lPtrq8zKQKI6Iap7o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
