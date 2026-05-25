@@ -1,9 +1,15 @@
-import 'package:flutter/material.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
 import '../../core/models/fortune_model.dart';
 import '../../core/network/mock_service.dart';
 
-class MyFortunesViewModel extends ChangeNotifier {
-  Stream<List<ContentModel>> get fortunesStream async* {
+part 'my_fortunes_view_model.g.dart';
+
+// Kullanıcının tüm fal geçmişini stream olarak yayınlar.
+@riverpod
+class MyFortunesViewModel extends _$MyFortunesViewModel {
+  @override
+  Stream<List<ContentModel>> build() async* {
     while (true) {
       await Future.delayed(const Duration(seconds: 1));
       final fortunes = await MockService.getFortuneHistory();
@@ -23,13 +29,13 @@ class MyFortunesViewModel extends ChangeNotifier {
     }
   }
 
+  // Falı okundu olarak işaretler.
   Future<void> markAsRead(String fortuneId) async {
     await MockService.markFortuneAsRead(fortuneId);
-    notifyListeners();
   }
 
+  // Falı erişilebilir hale getirir.
   Future<void> makeFortuneAccessible(String fortuneId) async {
     await MockService.makeFortuneAccessible(fortuneId);
-    notifyListeners();
   }
 }

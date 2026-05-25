@@ -1,19 +1,24 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fortuneapp/features/astrology/chinese_zodiac/animal_enum.dart';
-import 'package:provider/provider.dart';
 import '../../../core/models/current_user.dart';
 
-class ChineseZodiac extends StatelessWidget {
+// Kullanıcının doğum tarihine göre Çin burcunu gösteren ekran.
+class ChineseZodiac extends ConsumerWidget {
   const ChineseZodiac({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    DateTime dateTime = context.read<CurrentUser>().currentUser!.birthDate;
-    if (kDebugMode) {
-      print("Birth Year: $dateTime");
+  Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(
+      currentUserProvider.select((value) => value.value),
+    );
+    if (user == null) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
-    AnimalEnum animal = AnimalEnum.calculateChineseZodiac(dateTime);
+    final dateTime = user.birthDate;
+    if (kDebugMode) print('Birth Year: $dateTime');
+    final animal = AnimalEnum.calculateChineseZodiac(dateTime);
 
     return Scaffold(
       body: Padding(

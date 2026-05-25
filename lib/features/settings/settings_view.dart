@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:fortuneapp/core/navigation/app_navigator_manager.dart';
-import 'package:fortuneapp/core/navigation/app_navigator.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fortuneapp/core/auth/auth_manager.dart';
+import 'package:fortuneapp/core/navigation/app_navigator.dart';
+import 'package:fortuneapp/core/navigation/app_navigator_manager.dart';
 
-class SettingsView extends StatefulWidget {
+// Uygulama ayarları ekranı.
+class SettingsView extends ConsumerStatefulWidget {
   const SettingsView({super.key});
 
   @override
-  State<SettingsView> createState() => _SettingsViewState();
+  ConsumerState<SettingsView> createState() => _SettingsViewState();
 }
 
-class _SettingsViewState extends State<SettingsView> {
+class _SettingsViewState extends ConsumerState<SettingsView> {
   bool _askBeforeUsingGold = true;
   bool _notificationsEnabled = true;
   String _selectedLanguage = 'Türkçe';
@@ -44,8 +45,7 @@ class _SettingsViewState extends State<SettingsView> {
                 // TODO: Yardım sayfasına yönlendir
               }),
               _buildListTile('Çıkış Yap', () async {
-                final authManager = Provider.of<AuthManager>(context, listen: false);
-                await authManager.signOut();
+                await ref.read(authManagerProvider.notifier).signOut();
                 if (context.mounted) {
                   AppNavigatorManager.instance.pushAndRemoveUntil(AppRoutes.login);
                 }
@@ -151,8 +151,7 @@ class _SettingsViewState extends State<SettingsView> {
             TextButton(
               child: const Text('Sil', style: TextStyle(color: Colors.red)),
               onPressed: () async {
-                final authManager = Provider.of<AuthManager>(context, listen: false);
-                await authManager.signOut();
+                await ref.read(authManagerProvider.notifier).signOut();
                 if (context.mounted) {
                   AppNavigatorManager.instance.pushAndRemoveUntil(AppRoutes.login);
                 }

@@ -3,47 +3,45 @@ import 'package:flutter/foundation.dart';
 import 'package:fortuneapp/core/config/env.dart';
 import 'package:fortuneapp/enums/fortune_topic.dart';
 import 'package:fortuneapp/enums/gpt_content_type.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
 import '../../core/models/gpt_model.dart';
 
+part 'gpt_service.g.dart';
+
+// OpenAI chat completion API'ını saran stateless servis.
 class GptService {
   final Dio dio = Dio();
   final String _apiKey = Env.gptApiKey;
-  final String _baseUrl = "https://api.openai.com/v1/chat/completions";
+  final String _baseUrl = 'https://api.openai.com/v1/chat/completions';
   final String _model = Env.gptModel;
 
-  Future<String?> createMessage({required String message, required ContentType contentType, FortuneTopic? fortuneTopic}) async {
-    ChatPost chatPost = ChatPost(
+  // Tek bir kullanıcı mesajından chat completion alır.
+  Future<String?> createMessage({
+    required String message,
+    required ContentType contentType,
+    FortuneTopic? fortuneTopic,
+  }) async {
+    final chatPost = ChatPost(
       model: _model,
       messages: [
-        ///systemMessage,
-        ChatMessage(
-          role: "system",
-          content: contentType.systemMessageContent,
-        ),
-
-        ///userMessage,
-        ChatMessage(role: "user", content: message)
+        ChatMessage(role: 'system', content: contentType.systemMessageContent),
+        ChatMessage(role: 'user', content: message),
       ],
     );
 
     try {
-      String? result = await sendMessage(chatPost);
-      if (result != null && result.isNotEmpty) {
-        return result;
-      } else {
-        if (kDebugMode) {
-          print("Empty message");
-        }
-        return null;
-      }
+      final result = await sendMessage(chatPost);
+      if (result != null && result.isNotEmpty) return result;
+      if (kDebugMode) print('Empty message');
+      return null;
     } catch (e) {
-      if (kDebugMode) {
-        print('Error fetching ${contentType.name}: $e');
-      }
+      if (kDebugMode) print('Error fetching ${contentType.name}: $e');
     }
     return null;
   }
 
+  // Hazırlanmış ChatPost'u API'ya gönderir.
   Future<String?> sendMessage(ChatPost chatPost) async {
     try {
       final response = await dio.post(
@@ -58,27 +56,21 @@ class GptService {
       );
       if (response.statusCode == 200) {
         final responseData = response.data;
-
-        // Güvenli erişim ve null kontrolü
         if (responseData['choices'] != null &&
             responseData['choices'].isNotEmpty &&
             responseData['choices'][0]['message'] != null &&
             responseData['choices'][0]['message']['content'] != null) {
-          String message = responseData['choices'][0]['message']['content'];
-          return message;
-        } else {
-          if (kDebugMode) {
-            print("Unexpected response structure");
-          }
-          return null;
+          return responseData['choices'][0]['message']['content'] as String;
         }
+        if (kDebugMode) print('Unexpected response structure');
       }
     } catch (e) {
-      if (kDebugMode) {
-        print("error: $e");
-      }
-      return null;
+      if (kDebugMode) print('error: $e');
     }
     return null;
   }
 }
+
+// GptService DI provider'ı.
+@Riverpod(keepAlive: true)
+GptService gptService(Ref ref) => GptService();

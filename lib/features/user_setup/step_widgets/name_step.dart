@@ -1,22 +1,35 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../user_setup_view_model.dart';
 
-class NameStep extends StatelessWidget {
-  NameStep({super.key});
+// Kullanıcı kurulumu — ad girişi adımı.
+class NameStep extends ConsumerStatefulWidget {
+  const NameStep({super.key});
+
+  @override
+  ConsumerState<NameStep> createState() => _NameStepState();
+}
+
+class _NameStepState extends ConsumerState<NameStep> {
   final TextEditingController _controller = TextEditingController();
 
   @override
-  Widget build(BuildContext context) {
-    final UserSetupViewModel viewModel = context.read<UserSetupViewModel>();
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
+  @override
+  Widget build(BuildContext context) {
+    final notifier = ref.read(userSetupViewModelProvider.notifier);
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            "Öncelikle seni tanıyalım.",
+            'Öncelikle seni tanıyalım.',
             style: TextStyle(
               color: Colors.white,
               fontSize: 20,
@@ -25,11 +38,9 @@ class NameStep extends StatelessWidget {
           ),
           TextFormField(
             controller: _controller,
-            onChanged: (value) {
-              viewModel.updateUser(name: value); // ViewModel'de name alanını güncelle
-            },
+            onChanged: (value) => notifier.updateUser(name: value),
             decoration: const InputDecoration(
-              labelText: "Adın nedir?",
+              labelText: 'Adın nedir?',
               suffixIcon: Icon(Icons.edit_outlined),
             ),
           ),

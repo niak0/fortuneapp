@@ -1,35 +1,38 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fortuneapp/core/logic/gold_controller.dart';
-import 'package:provider/provider.dart';
 
 import '../../../core/navigation/app_navigator.dart';
 import '../../../core/navigation/app_navigator_manager.dart';
-import '../../../core/models/fortune_model.dart';
 import '../home_view_model.dart';
 import 'dots_indicator.dart';
 
-class BuildStreamBuilder extends StatelessWidget {
-  const BuildStreamBuilder({
-    super.key,
-    required this.viewModel,
-  });
+// Yakın zamandaki falları (okunmamış/erişilemez) yatay swipe ile sunar.
+class BuildStreamBuilder extends ConsumerStatefulWidget {
+  const BuildStreamBuilder({super.key});
 
-  final HomeViewModel viewModel;
+  @override
+  ConsumerState<BuildStreamBuilder> createState() => _BuildStreamBuilderState();
+}
+
+class _BuildStreamBuilderState extends ConsumerState<BuildStreamBuilder> {
+  final PageController _pageController = PageController();
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    PageController pageController = PageController();
-    return StreamBuilder<List<ContentModel>>(
-      stream: viewModel.recentFortunesStream,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const SizedBox.shrink();
-        }
-        final fortunes = snapshot.data ?? [];
-        if (fortunes.isEmpty) {
-          return const SizedBox.shrink();
-        }
+    final asyncFortunes = ref.watch(homeViewModelProvider);
+    final vm = ref.read(homeViewModelProvider.notifier);
+    final goldController = ref.read(goldControllerProvider);
 
+    return asyncFortunes.maybeWhen(
+      data: (fortunes) {
+        if (fortunes.isEmpty) return const SizedBox.shrink();
         return SizedBox(
           height: 80,
           child: Column(
@@ -37,7 +40,7 @@ class BuildStreamBuilder extends StatelessWidget {
               SizedBox(
                 height: 60,
                 child: PageView.builder(
-                  controller: pageController,
+                  controller: _pageController,
                   itemCount: fortunes.length,
                   itemBuilder: (context, index) {
                     final fortune = fortunes[index];
@@ -49,33 +52,37 @@ class BuildStreamBuilder extends StatelessWidget {
                       child: ListTile(
                         tileColor: Theme.of(context).colorScheme.primary,
                         dense: true,
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 5),
+                        contentPadding:
+                            const EdgeInsets.symmetric(horizontal: 5),
                         title: Text(
-                          isAccessible ? "Falın hazır" : "Yorumlanıyor",
+                          isAccessible ? 'Falın hazır' : 'Yorumlanıyor',
                           style: Theme.of(context).textTheme.bodyLarge,
                         ),
                         subtitle: Text(
-                          isAccessible ? 'Hemen Oku!' : 'Yaklaşık ${viewModel.calculateRemainingTimes(unlockTime).inMinutes + 1} dk.',
+                          isAccessible
+                              ? 'Hemen Oku!'
+                              : 'Yaklaşık ${vm.calculateRemainingTimes(unlockTime).inMinutes + 1} dk.',
                           style: Theme.of(context).textTheme.bodySmall,
                         ),
-                        leading: Icon(Icons.coffee, size: 50, color: Theme.of(context).colorScheme.onSurface),
+                        leading: Icon(
+                          Icons.coffee,
+                          size: 50,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
                         trailing: isAccessible
                             ? null
-                            : Consumer<GoldController>(
-                                builder: (context, goldController, child) {
-                                  return ElevatedButton(
-                                    onPressed: () async {
-                                      await viewModel.makeFortuneAccessible(fortune.id ?? '');
-                                      await goldController.decreaseGold();
-                                    },
-                                    child: const Text("Hızlandır"),
-                                  );
+                            : ElevatedButton(
+                                onPressed: () async {
+                                  await vm.makeFortuneAccessible(
+                                      fortune.id ?? '');
+                                  await goldController.decreaseGold();
                                 },
+                                child: const Text('Hızlandır'),
                               ),
                         onTap: isAccessible
                             ? () async {
                                 if (!isRead) {
-                                  await viewModel.markAsRead(fortune.id ?? '');
+                                  await vm.markAsRead(fortune.id ?? '');
                                 }
                                 AppNavigatorManager.instance.pushToPage(
                                   AppRoutes.readFortune,
@@ -93,7 +100,7 @@ class BuildStreamBuilder extends StatelessWidget {
                   height: 20,
                   child: Center(
                     child: DotsIndicator(
-                      controller: pageController,
+                      controller: _pageController,
                       itemCount: fortunes.length,
                     ),
                   ),
@@ -102,6 +109,7 @@ class BuildStreamBuilder extends StatelessWidget {
           ),
         );
       },
+      orElse: () => const SizedBox.shrink(),
     );
   }
 }

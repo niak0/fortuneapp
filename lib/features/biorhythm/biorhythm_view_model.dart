@@ -1,49 +1,56 @@
 import 'dart:math';
-import 'package:flutter/material.dart';
+
 import 'package:fortuneapp/features/biorhythm/helpers/day_items.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-class BiorhythmViewModel extends ChangeNotifier {
-  final DateTime birthDate;
+part 'biorhythm_view_model.g.dart';
 
-  DateTime currentDate = DateTime.now();
+// Seçili gün (dün/bugün/yarın) için biyoritim hesaplaması yapar.
+@riverpod
+class BiorhythmViewModel extends _$BiorhythmViewModel {
+  late final DateTime _birthDate;
 
-  DayItems selectedDay = DayItems.today;
+  @override
+  DayItems build({required DateTime birthDate}) {
+    _birthDate = birthDate;
+    return DayItems.today;
+  }
 
-  BiorhythmViewModel(this.birthDate);
-
+  // Seçili güne kadar geçen gün sayısı.
   int daysBetween() {
-    DateTime selectedDate = getSelectedDate();
-    return selectedDate.difference(birthDate).inDays;
+    final selectedDate = getSelectedDate();
+    return selectedDate.difference(_birthDate).inDays;
   }
 
-  double calculateBiorhythm(int days, int cycle) {
-    return sin((2 * pi * days) / cycle);
-  }
+  // Bir döngü için sinüs değeri.
+  double calculateBiorhythm(int days, int cycle) =>
+      sin((2 * pi * days) / cycle);
 
+  // 0-1 arası ondalık dilim.
   double decimal(int cycle) {
-    // ondalık dilim hesaplama
-    int daysPassed = daysBetween();
+    final daysPassed = daysBetween();
     return (1 + sin(2 * pi * daysPassed / cycle)) / 2;
   }
 
-  int percentage(int cycle) {
-    return (decimal(cycle) * 100).round();
-  }
+  // 0-100 arası yüzde.
+  int percentage(int cycle) => (decimal(cycle) * 100).round();
 
+  // Seçili günü değiştirir.
   void setSelectDay(DayItems newDay) {
-    selectedDay = newDay;
-    notifyListeners();
+    if (newDay == state) return;
+    state = newDay;
   }
 
+  // Mevcut seçime göre tarihi döner.
   DateTime getSelectedDate() {
-    switch (selectedDay) {
+    final now = DateTime.now();
+    switch (state) {
       case DayItems.yesterday:
-        return currentDate.subtract(const Duration(days: 1)); // Dün
+        return now.subtract(const Duration(days: 1));
       case DayItems.tomorrow:
-        return currentDate.add(const Duration(days: 1)); // Yarın
+        return now.add(const Duration(days: 1));
       case DayItems.today:
-      default:
-        return currentDate; // Bugün
+        return now;
     }
   }
 }

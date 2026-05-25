@@ -1,46 +1,39 @@
-import 'package:flutter/material.dart';
 import 'package:fortuneapp/core/models/user_model.dart';
 import 'package:fortuneapp/core/network/mock_service.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-class CurrentUser extends ChangeNotifier {
-  UserModel? _currentUser;
-  UserModel? get currentUser => _currentUser;
+part 'current_user.g.dart';
 
-  // Mock data ile başlatma
-  Future<void> initializeMockUser() async {
-    _currentUser = MockService.mockUser;
-    notifyListeners();
+// Uygulama boyunca aktif kullanıcı state'i (Riverpod AsyncNotifier).
+@Riverpod(keepAlive: true)
+class CurrentUser extends _$CurrentUser {
+  @override
+  Future<UserModel?> build() async {
+    await MockService.initializeData();
+    return MockService.mockUser;
   }
 
-  // Kullanıcı güncelleme
+  // Kullanıcıyı tamamen değiştirir.
   void updateUser(UserModel user) {
-    _currentUser = user;
-    notifyListeners();
+    state = AsyncData(user);
   }
 
-  // Altın artırma
+  // Mevcut kullanıcıya altın ekler.
   void incrementGold({required int amount}) {
-    if (_currentUser != null) {
-      _currentUser = _currentUser!.copyWith(
-        coin: _currentUser!.coin + amount,
-      );
-      notifyListeners();
-    }
+    final current = state.value;
+    if (current == null) return;
+    state = AsyncData(current.copyWith(coin: current.coin + amount));
   }
 
-  // Altın azaltma
+  // Mevcut kullanıcının altınını azaltır.
   void decrementGold(int amount) {
-    if (_currentUser != null) {
-      _currentUser = _currentUser!.copyWith(
-        coin: _currentUser!.coin - amount,
-      );
-      notifyListeners();
-    }
+    final current = state.value;
+    if (current == null) return;
+    state = AsyncData(current.copyWith(coin: current.coin - amount));
   }
 
-  // Oturumu kapat
+  // Oturumu kapatır, kullanıcıyı temizler.
   void clearUser() {
-    _currentUser = null;
-    notifyListeners();
+    state = const AsyncData(null);
   }
 }

@@ -1,31 +1,33 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
 
-// Mock internet bağlantı servisi
-class ConnectivityService extends ChangeNotifier {
-  bool isConnected = true;
-  Timer? _mockTimer;
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-  ConnectivityService() {
-    _initializeMockConnectivity();
-  }
+part 'connectivity_service.g.dart';
 
-  void _initializeMockConnectivity() {
-    // Her 5 saniyede bir %95 ihtimalle bağlantı var, %5 ihtimalle yok
-    _mockTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
+// Mock internet bağlantı durumu yayınlayan StreamNotifier.
+@Riverpod(keepAlive: true)
+class ConnectivityService extends _$ConnectivityService {
+  @override
+  Stream<bool> build() {
+    final controller = StreamController<bool>();
+    var isConnected = true;
+    controller.add(isConnected);
+
+    // 5 sn'de bir %95 ihtimalle bağlantı var, %5 ihtimalle yok.
+    final timer = Timer.periodic(const Duration(seconds: 5), (_) {
       final random = DateTime.now().millisecondsSinceEpoch % 100;
-      final newStatus = random < 95; // %95 ihtimalle true
-
+      final newStatus = random < 95;
       if (isConnected != newStatus) {
         isConnected = newStatus;
-        notifyListeners();
+        controller.add(newStatus);
       }
     });
-  }
 
-  @override
-  void dispose() {
-    _mockTimer?.cancel();
-    super.dispose();
+    ref.onDispose(() {
+      timer.cancel();
+      controller.close();
+    });
+
+    return controller.stream;
   }
 }

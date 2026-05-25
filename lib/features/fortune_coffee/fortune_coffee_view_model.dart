@@ -1,48 +1,80 @@
-import 'package:flutter/foundation.dart';
 import 'package:fortuneapp/enums/fortune_topic.dart';
 import 'package:fortuneapp/enums/relationship_status.dart';
 import 'package:fortuneapp/enums/work_status.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../core/models/user_model.dart';
 
-class FortuneCoffeeViewModel extends ChangeNotifier {
-  final List<String> _photos = ["", "", ""];
+part 'fortune_coffee_view_model.g.dart';
 
-  FortuneTopic? _selectedFortuneTopic;
+// Kahve falı ekranının state'i — 3 foto + seçili konu.
+class FortuneCoffeeState {
+  final List<String> photos;
+  final FortuneTopic? selectedFortuneTopic;
 
-  List<String> get photos => List.unmodifiable(_photos);
-  FortuneTopic? get selectedFortuneTopic => _selectedFortuneTopic;
+  const FortuneCoffeeState({
+    required this.photos,
+    required this.selectedFortuneTopic,
+  });
 
-  bool handleFortuneCreation() {
-    if (_photos.any((photo) => photo.isEmpty) || _selectedFortuneTopic == null) {
-      return false;
-    }
-    return true;
-  }
+  factory FortuneCoffeeState.initial() => const FortuneCoffeeState(
+        photos: ['', '', ''],
+        selectedFortuneTopic: null,
+      );
 
+  bool get isValid =>
+      !photos.any((p) => p.isEmpty) && selectedFortuneTopic != null;
+
+  FortuneCoffeeState copyWith({
+    List<String>? photos,
+    FortuneTopic? selectedFortuneTopic,
+    bool clearTopic = false,
+  }) =>
+      FortuneCoffeeState(
+        photos: photos ?? this.photos,
+        selectedFortuneTopic:
+            clearTopic ? null : (selectedFortuneTopic ?? this.selectedFortuneTopic),
+      );
+}
+
+// Kahve falı için fotoğraf seçimi ve konu seçimi Notifier'ı.
+@riverpod
+class FortuneCoffeeViewModel extends _$FortuneCoffeeViewModel {
+  @override
+  FortuneCoffeeState build() => FortuneCoffeeState.initial();
+
+  bool handleFortuneCreation() => state.isValid;
+
+  // GPT'ye fal isteği gönderir (şu an mock, prompt oluşturuluyor).
   Future<void> getFortuneAndSaveFirebase(UserModel currentUser) async {
-    final newFortuneMessage = "Fal konusu: ${_selectedFortuneTopic!.displayName}, isim: ${currentUser.name}, cinsiyet: ${currentUser.gender}, burç: "
-        "${currentUser.age}, ilişki durumu: ${RelationshipStatus.values.firstWhere((r) => r.name == currentUser.relationShipState).turkishName}, "
-        "çalışma durumu: ${WorkStatus.values.firstWhere((w) => w.name == currentUser.workState).turkishName}";
+    final topic = state.selectedFortuneTopic;
+    if (topic == null) return;
+    final _ = 'Fal konusu: ${topic.displayName}, isim: ${currentUser.name}, '
+        'cinsiyet: ${currentUser.gender}, burç: ${currentUser.age}, '
+        'ilişki durumu: ${RelationshipStatus.values.firstWhere((r) => r.name == currentUser.relationShipState).turkishName}, '
+        'çalışma durumu: ${WorkStatus.values.firstWhere((w) => w.name == currentUser.workState).turkishName}';
   }
 
+  // Galeriden foto seçer ve slot'u günceller.
   Future<void> pickPhoto(int index) async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
-      _photos[index] = image.path;
-      notifyListeners();
-    }
+    final picker = ImagePicker();
+    final image = await picker.pickImage(source: ImageSource.gallery);
+    if (image == null) return;
+    final newPhotos = List<String>.from(state.photos);
+    newPhotos[index] = image.path;
+    state = state.copyWith(photos: newPhotos);
   }
 
+  // Slot'taki fotoğrafı temizler.
   void deletePhoto(int index) {
-    _photos[index] = "";
-    notifyListeners();
+    final newPhotos = List<String>.from(state.photos);
+    newPhotos[index] = '';
+    state = state.copyWith(photos: newPhotos);
   }
 
+  // Fal konusunu seçer.
   void selectFortuneTopic(FortuneTopic topic) {
-    _selectedFortuneTopic = topic;
-    notifyListeners();
+    state = state.copyWith(selectedFortuneTopic: topic);
   }
 }

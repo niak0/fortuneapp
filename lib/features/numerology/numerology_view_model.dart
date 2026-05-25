@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:fortuneapp/features/numerology/helpers/numerology_items.dart';
 
-class NumerologyViewModel extends ChangeNotifier {
+// Numeroloji hesaplamaları için saf (stateless) hesap sınıfı.
+class NumerologyViewModel {
   /// Kullanıcının tam adı.
   final String name;
 
@@ -51,8 +51,6 @@ class NumerologyViewModel extends ChangeNotifier {
     calculatedValues[TimeCycles.personalYear] = _calculatePersonalYearNumber(birthDate, currentDate);
     calculatedValues[TimeCycles.personalMonth] = _calculatePersonalMonthNumber(birthDate, currentDate);
     calculatedValues[TimeCycles.personalDay] = _calculatePersonalDayNumber(birthDate, currentDate);
-
-    notifyListeners();
   }
 
   /// Belirli bir `NumerologyItem` için hesaplanmış değeri döndürür.

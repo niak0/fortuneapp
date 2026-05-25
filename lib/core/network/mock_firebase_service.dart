@@ -1,19 +1,28 @@
 import 'package:flutter/foundation.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
 import '../../core/models/fortune_model.dart';
 import '../../core/models/user_model.dart';
 import 'mock_service.dart';
+
+part 'mock_firebase_service.g.dart';
 
 abstract class IFirebaseService {
   Future<void> saveUserToFireStore(UserModel user);
   Future<UserModel?> getUserFromFireStore(String userId);
   void deleteUserFromFirestore();
-  Future<bool> addFortune({required String content, required String contentType, required String? fortuneTopic});
+  Future<bool> addFortune({
+    required String content,
+    required String contentType,
+    required String? fortuneTopic,
+  });
   Stream<List<ContentModel>> getUserFortunesStream();
   Future<void> setFortuneAccess(String fortuneId);
   Future<void> markAsRead(String fortuneId);
   Future<void> deleteFortune(String documentId);
 }
 
+// Geliştirme için Firebase çağrılarını taklit eden mock servis.
 class MockFirebaseService implements IFirebaseService {
   @override
   Future<void> saveUserToFireStore(UserModel user) async {
@@ -50,9 +59,7 @@ class MockFirebaseService implements IFirebaseService {
       await MockService.addFortune(fortune);
       return true;
     } catch (e) {
-      if (kDebugMode) {
-        print('Error adding fortune: $e');
-      }
+      if (kDebugMode) print('Error adding fortune: $e');
       return false;
     }
   }
@@ -62,7 +69,9 @@ class MockFirebaseService implements IFirebaseService {
     while (true) {
       await Future.delayed(const Duration(seconds: 1));
       final fortunes = await MockService.getFortuneHistory();
-      yield fortunes.map((f) => ContentModel.fromJson(f, f['id'] as String)).toList();
+      yield fortunes
+          .map((f) => ContentModel.fromJson(f, f['id'] as String))
+          .toList();
     }
   }
 
@@ -82,3 +91,7 @@ class MockFirebaseService implements IFirebaseService {
     MockService.mockFortuneHistory.removeWhere((f) => f['id'] == documentId);
   }
 }
+
+// MockFirebaseService DI provider'ı.
+@Riverpod(keepAlive: true)
+MockFirebaseService mockFirebaseService(Ref ref) => MockFirebaseService();

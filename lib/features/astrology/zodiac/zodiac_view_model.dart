@@ -1,20 +1,42 @@
-import 'package:flutter/material.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
 import '../../../core/network/mock_service.dart';
 import 'zodiac_model.dart';
 import 'zodiac_view.dart';
 
-class ZodiacViewModel extends ChangeNotifier {
-  List<ZodiacModel> _zodiacModels = [];
-  ZodiacModel? _selectedZodiac;
-  ZodiacSegments? _selectedSegment = ZodiacSegments.week;
+part 'zodiac_view_model.g.dart';
 
-  List<ZodiacModel> get zodiacModels => _zodiacModels;
-  ZodiacModel? get selectedZodiac => _selectedZodiac;
-  ZodiacSegments? get selectedSegment => _selectedSegment;
+// Burç ekranının state'i — yüklü burçlar, seçili burç, seçili segment.
+class ZodiacState {
+  final List<ZodiacModel> zodiacModels;
+  final ZodiacModel? selectedZodiac;
+  final ZodiacSegments selectedSegment;
 
-  Future<void> fetchZodiacSigns() async {
+  const ZodiacState({
+    required this.zodiacModels,
+    required this.selectedZodiac,
+    required this.selectedSegment,
+  });
+
+  ZodiacState copyWith({
+    List<ZodiacModel>? zodiacModels,
+    ZodiacModel? selectedZodiac,
+    ZodiacSegments? selectedSegment,
+  }) =>
+      ZodiacState(
+        zodiacModels: zodiacModels ?? this.zodiacModels,
+        selectedZodiac: selectedZodiac ?? this.selectedZodiac,
+        selectedSegment: selectedSegment ?? this.selectedSegment,
+      );
+}
+
+// Burç verilerini mock servisten yükleyen AsyncNotifier.
+@riverpod
+class ZodiacViewModel extends _$ZodiacViewModel {
+  @override
+  Future<ZodiacState> build() async {
     final data = await MockService.getZodiacModels();
-    _zodiacModels = data
+    final models = data
         .map((json) => ZodiacModel(
               sign: json['sign'],
               planet: json['planet'],
@@ -31,18 +53,24 @@ class ZodiacViewModel extends ChangeNotifier {
               commentYearly: json['commentYearly'],
             ))
         .toList();
-
-    _selectedZodiac = _zodiacModels.first;
-    notifyListeners();
+    return ZodiacState(
+      zodiacModels: models,
+      selectedZodiac: models.isNotEmpty ? models.first : null,
+      selectedSegment: ZodiacSegments.week,
+    );
   }
 
+  // Aktif burcu değiştirir.
   void setSelectedZodiac(ZodiacModel zodiac) {
-    _selectedZodiac = zodiac;
-    notifyListeners();
+    final current = state.value;
+    if (current == null) return;
+    state = AsyncData(current.copyWith(selectedZodiac: zodiac));
   }
 
+  // Seçili zaman dilimini değiştirir.
   void setSelectedSegment(ZodiacSegments segment) {
-    _selectedSegment = segment;
-    notifyListeners();
+    final current = state.value;
+    if (current == null) return;
+    state = AsyncData(current.copyWith(selectedSegment: segment));
   }
 }

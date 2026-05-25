@@ -1,41 +1,31 @@
 import 'package:flutter/foundation.dart';
 import 'package:fortuneapp/core/utils/gold_manager.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-class BuyGoldViewModel extends ChangeNotifier {
-  bool isLoading = true;
-  final GoldManager goldManager;
-  BuyGoldViewModel(this.goldManager);
+part 'buy_gold_view_model.g.dart';
 
-  Future<void> initializeRevenueCat() async {
+// Altın satın alma ekranı için AsyncNotifier — loading durumunu tutar.
+@riverpod
+class BuyGoldViewModel extends _$BuyGoldViewModel {
+  @override
+  Future<void> build() async {
     await _fetchPackages();
-    isLoading = false;
-    notifyListeners();
   }
 
   Future<void> _fetchPackages() async {
-    try {
-      notifyListeners();
-    } catch (e) {
-      if (kDebugMode) {
-        print("Paketleri yüklerken hata: $e");
-      }
-    }
+    // RevenueCat paketleri burada yüklenecek.
   }
 
+  // Bir paketi satın alır ve başarılıysa altın artırır.
   Future<bool> buyPackage(String package) async {
     try {
-      int coinAmount = 0;
-
-      // Satın alınan pakete göre altın miktarını ayarla
-
+      const coinAmount = 0;
       if (coinAmount > 0) {
-        goldManager.increaseGold(amount: coinAmount);
+        ref.read(goldManagerProvider).increaseGold(amount: coinAmount);
       }
       return true;
     } catch (e) {
-      if (kDebugMode) {
-        print("Satın alma başarısız: $e");
-      }
+      if (kDebugMode) print('Satın alma başarısız: $e');
       return false;
     }
   }

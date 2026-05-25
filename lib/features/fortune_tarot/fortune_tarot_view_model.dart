@@ -1,56 +1,90 @@
 import 'dart:convert';
 import 'dart:math';
-import 'package:flutter/material.dart';
+
 import 'package:flutter/services.dart';
-
 import 'package:fortuneapp/features/fortune_tarot/tarot_model.dart';
-import '../../core/models/user_model.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-class FortuneTarotViewModel extends ChangeNotifier {
-  List<CardModel>? cards;
+part 'fortune_tarot_view_model.g.dart';
 
-  final UserModel currentUser;
+// Tarot ekranının state'i: yüklenen kartlar, seçilenler, çark açısı.
+class FortuneTarotState {
+  final List<CardModel>? cards;
+  final Map<String, int?> selectedCards;
+  final double angle;
 
-  FortuneTarotViewModel(this.currentUser);
+  const FortuneTarotState({
+    required this.cards,
+    required this.selectedCards,
+    required this.angle,
+  });
 
-  Map<String, int?> selectedCards = {
-    "Geçmiş": null,
-    "Şimdi": null,
-    "Gelecek": null,
-  };
-  double angle = 0.0;
+  factory FortuneTarotState.initial() => const FortuneTarotState(
+        cards: null,
+        selectedCards: {'Geçmiş': null, 'Şimdi': null, 'Gelecek': null},
+        angle: 0.0,
+      );
 
-  void initCards() async {
-    final jsonString = await rootBundle.loadString('assets/tarot/tarot-images.json');
+  FortuneTarotState copyWith({
+    List<CardModel>? cards,
+    Map<String, int?>? selectedCards,
+    double? angle,
+  }) =>
+      FortuneTarotState(
+        cards: cards ?? this.cards,
+        selectedCards: selectedCards ?? this.selectedCards,
+        angle: angle ?? this.angle,
+      );
+}
+
+// Tarot çekme akışı için AsyncNotifier — kart JSON'unu yükler.
+@riverpod
+class FortuneTarotViewModel extends _$FortuneTarotViewModel {
+  @override
+  Future<FortuneTarotState> build() async {
+    final jsonString =
+        await rootBundle.loadString('assets/tarot/tarot-images.json');
     final Map<String, dynamic> jsonResponse = json.decode(jsonString);
-    cards = (jsonResponse['cards'] as List).map((card) => CardModel.fromMap(card)).toList();
-    notifyListeners();
+    final cards = (jsonResponse['cards'] as List)
+        .map((card) => CardModel.fromMap(card))
+        .toList();
+    return FortuneTarotState.initial().copyWith(cards: cards);
   }
 
+  // Çarkı verilen açı kadar döndürür.
   void rotateWheel(double rotationAngle) {
-    angle += rotationAngle;
-    notifyListeners();
+    final current = state.value;
+    if (current == null) return;
+    state = AsyncData(current.copyWith(angle: current.angle + rotationAngle));
   }
 
+  // Kart seçim slot'una rastgele bir kart yerleştirir.
   void handleTapOnCard() {
-    if (cards?.isNotEmpty ?? false) {
-      int randomIndex;
-      do {
-        randomIndex = Random().nextInt(cards!.length);
-      } while (selectedCards.containsValue(randomIndex)); // Daha önce seçilmemiş kart bulunana kadar döner
+    final current = state.value;
+    if (current == null) return;
+    final cards = current.cards;
+    if (cards == null || cards.isEmpty) return;
 
-      // Boş olan ilk alanı bul
-      String? nextEmptyArea = selectedCards.entries.firstWhere((entry) => entry.value == null, orElse: () => const MapEntry("", null)).key;
+    int randomIndex;
+    do {
+      randomIndex = Random().nextInt(cards.length);
+    } while (current.selectedCards.containsValue(randomIndex));
 
-      if (nextEmptyArea.isNotEmpty) {
-        selectedCards[nextEmptyArea] = randomIndex;
-        notifyListeners();
-      }
-    }
+    final nextEmptyArea = current.selectedCards.entries
+        .firstWhere(
+          (entry) => entry.value == null,
+          orElse: () => const MapEntry('', null),
+        )
+        .key;
+    if (nextEmptyArea.isEmpty) return;
+
+    final updated = Map<String, int?>.from(current.selectedCards);
+    updated[nextEmptyArea] = randomIndex;
+    state = AsyncData(current.copyWith(selectedCards: updated));
   }
 
+  // Seçilen kartları işler (mock async).
   Future<void> handleSelectedCards() async {
-    // Mock işlem
     await Future.delayed(const Duration(seconds: 2));
   }
 }

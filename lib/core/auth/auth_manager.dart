@@ -1,17 +1,27 @@
-import 'package:flutter/foundation.dart';
-import '../network/mock_service.dart';
+import 'package:fortuneapp/core/network/mock_service.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-class AuthManager extends ChangeNotifier {
-  bool get isLoggedIn => MockService.isUserLoggedIn;
+part 'auth_manager.g.dart';
 
-  Future<bool> signIn({String email = "test@test.com", String password = "test123"}) async {
+// Mock authentication state'ini tutan global Notifier.
+@Riverpod(keepAlive: true)
+class AuthManager extends _$AuthManager {
+  @override
+  bool build() => MockService.isUserLoggedIn;
+
+  // Mock login işlemi.
+  Future<bool> signIn({
+    String email = 'test@test.com',
+    String password = 'test123',
+  }) async {
     final result = await MockService.signIn(email, password);
-    notifyListeners();
+    state = MockService.isUserLoggedIn;
     return result;
   }
 
+  // Mock logout işlemi.
   Future<void> signOut() async {
     await MockService.signOut();
-    notifyListeners();
+    state = MockService.isUserLoggedIn;
   }
 }

@@ -1,31 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../home/home_view.dart';
 import '../my_fortunes/my_fortunes_view.dart';
 
-class NavigationBarViewModel with ChangeNotifier {
-  int _currentIndex = 0;
-  final _homeView = const HomeView();
-  final _myFortunesView = const MyFortunesView();
+part 'navigation_bar_manager.g.dart';
 
-  int get currentIndex => _currentIndex;
+// Bottom navigation seçili sekme indeksini tutar.
+@riverpod
+class NavigationBarViewModel extends _$NavigationBarViewModel {
+  @override
+  int build() => 0;
 
+  // Yeni indeksi yazar; aynı ise no-op.
   void setIndex(int index) {
-    if (index == _currentIndex) return;
-    _currentIndex = index;
-    notifyListeners();
+    if (index == state) return;
+    state = index;
   }
-
-  List<BottomNavigationBarItem> navBarItems = const [
-    BottomNavigationBarItem(icon: Icon(Icons.home_outlined), label: 'Anasayfa'),
-    BottomNavigationBarItem(icon: Icon(Icons.notification_add_outlined), label: 'Fallarım'),
-  ];
-
-  String getAppBarTitle() => navBarItems[_currentIndex].label ?? "null";
-
-  List<Widget> get _pages => [
-        _homeView,
-        _myFortunesView,
-      ];
-  List<Widget> get pages => _pages;
 }
+
+// Sekme tanımları (sabit).
+const List<BottomNavigationBarItem> navBarItems = [
+  BottomNavigationBarItem(icon: Icon(Icons.home_outlined), label: 'Anasayfa'),
+  BottomNavigationBarItem(
+    icon: Icon(Icons.notification_add_outlined),
+    label: 'Fallarım',
+  ),
+];
+
+// Sekmelerin gösterdiği ekranlar.
+const List<Widget> navBarPages = [HomeView(), MyFortunesView()];

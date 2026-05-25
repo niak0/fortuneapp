@@ -1,22 +1,30 @@
-import 'package:fortuneapp/core/network/mock_firebase_service.dart';
-import '../models/current_user.dart';
+import 'package:fortuneapp/core/models/current_user.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+part 'gold_manager.g.dart';
+
+// Altın kontrol/işlem mantığını CurrentUser'a delege eden servis.
 class GoldManager {
-  GoldManager({required this.firebaseService, required this.currentUser});
+  GoldManager(this._ref);
+  final Ref _ref;
 
-  final CurrentUser currentUser;
-  final MockFirebaseService firebaseService;
-
-  /// Altın miktarını kontrol eder ve işlem yapılabilir mi bakar
-  bool checkGoldAndProceed(int requiredAmount) => currentUser.currentUser!.coin >= requiredAmount;
-
-  /// Kullanıcıya altın ekleme işlemi
-  Future<void> increaseGold({required int amount}) async {
-    currentUser.incrementGold(amount: amount); // Local olarak güncelleme
+  // Kullanıcının `requiredAmount` kadar altını var mı?
+  bool checkGoldAndProceed(int requiredAmount) {
+    final user = _ref.read(currentUserProvider).value;
+    return (user?.coin ?? 0) >= requiredAmount;
   }
 
-  /// Altını azaltma işlemi
+  // Mevcut kullanıcıya altın ekler.
+  Future<void> increaseGold({required int amount}) async {
+    _ref.read(currentUserProvider.notifier).incrementGold(amount: amount);
+  }
+
+  // Mevcut kullanıcıdan 1 altın düşer.
   Future<void> decreaseGold() async {
-    currentUser.decrementGold(1); // Local olarak güncelleme
+    _ref.read(currentUserProvider.notifier).decrementGold(1);
   }
 }
+
+// GoldManager DI provider'ı.
+@Riverpod(keepAlive: true)
+GoldManager goldManager(Ref ref) => GoldManager(ref);

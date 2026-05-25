@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fortuneapp/core/auth/auth_manager.dart';
 import 'package:fortuneapp/enums/drawer_items.dart';
-import 'package:provider/provider.dart';
 
 import '../../core/navigation/app_navigator.dart';
 import '../../core/navigation/app_navigator_manager.dart';
 
-class SideBar extends StatelessWidget {
+// Uygulamanın yan çekmecesi (drawer).
+class SideBar extends ConsumerWidget {
   const SideBar({super.key});
 
-  void _showSignOutDialog(BuildContext context) {
+  void _showSignOutDialog(BuildContext context, WidgetRef ref) {
     showDialog(
       context: context,
       builder: (context) {
@@ -26,7 +27,7 @@ class SideBar extends StatelessWidget {
             TextButton(
               onPressed: () async {
                 AppNavigatorManager.instance.pop();
-                await context.read<AuthManager>().signOut();
+                await ref.read(authManagerProvider.notifier).signOut();
                 AppNavigatorManager.instance.pushAndRemoveUntil(AppRoutes.login);
               },
               child: const Text("Çıkış Yap"),
@@ -66,7 +67,7 @@ class SideBar extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return SafeArea(
       child: Drawer(
         width: MediaQuery.of(context).size.width / 1.6,
@@ -99,10 +100,10 @@ class SideBar extends StatelessWidget {
               child: ElevatedButton(
                   onPressed: () {
                     if (context.mounted) {
-                      _showSignOutDialog(context);
+                      _showSignOutDialog(context, ref);
                     }
                   },
-                  child: Text("Çıkış Yap"))),
+                  child: const Text('Çıkış Yap'))),
 
           TextButton(
               onPressed: () {
