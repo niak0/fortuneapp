@@ -4,7 +4,7 @@ import 'package:fortuneapp/enums/zodiac_elements.dart';
 import 'package:fortuneapp/enums/zodiac_sign.dart';
 import 'package:fortuneapp/features/astrology/zodiac/zodiac_model.dart';
 
-import 'zodiac_view_model.dart';
+import 'zodiac_providers.dart';
 
 // Burç ekranı — seçili burcun yorumlarını/skorlarını gösterir.
 class ZodiacView extends ConsumerWidget {

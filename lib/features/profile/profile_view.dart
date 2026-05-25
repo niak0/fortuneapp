@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/models/current_user.dart';
+import '../../core/auth/current_user.dart';
 import '../../core/models/user_model.dart';
 import '../../core/navigation/app_navigator.dart';
-import '../../core/navigation/app_navigator_manager.dart';
 import '../../enums/zodiac_sign.dart';
 
 // Kullanıcının profil özet ekranı.
@@ -25,7 +24,7 @@ class ProfileView extends ConsumerWidget {
             icon: const Icon(Icons.save_alt_outlined),
           ),
           IconButton(
-            onPressed: () => AppNavigatorManager.instance.pop(),
+            onPressed: () => ref.read(appNavigatorProvider).pop(),
             icon: const Icon(Icons.settings),
           ),
         ],
@@ -37,7 +36,7 @@ class ProfileView extends ConsumerWidget {
             child: buildProfileCard(
               context,
               user,
-              () => AppNavigatorManager.instance.pushToPage(AppRoutes.profileEdit),
+              () => ref.read(appNavigatorProvider).pushToPage(AppRoutes.profileEdit),
             ),
           ),
         ],

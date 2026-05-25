@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../enums/relationship_status.dart';
-import '../user_setup_view_model.dart';
+import '../user_setup_providers.dart';
 
 // Kullanıcı kurulumu — ilişki durumu seçim adımı.
 class RelationshipStep extends ConsumerWidget {

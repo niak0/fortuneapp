@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:fortuneapp/core/navigation/app_navigator_manager.dart';
-import 'package:fortuneapp/core/network/mock_firebase_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fortuneapp/core/data/fortune_repository.dart';
+import 'package:fortuneapp/core/navigation/app_navigator.dart';
 import 'package:fortuneapp/core/widgets/loading_dialog.dart';
 import '../../core/models/fortune_model.dart';
 import 'font_size_slider.dart';
 
-class ReadFortuneView extends StatefulWidget {
+class ReadFortuneView extends ConsumerStatefulWidget {
   const ReadFortuneView({super.key, required this.currentContent});
 
   final ContentModel currentContent;
 
   @override
-  State<ReadFortuneView> createState() => _ReadFortuneViewState();
+  ConsumerState<ReadFortuneView> createState() => _ReadFortuneViewState();
 }
 
-class _ReadFortuneViewState extends State<ReadFortuneView> {
+class _ReadFortuneViewState extends ConsumerState<ReadFortuneView> {
   double _fontSize = 18.0; // Varsayılan yazı boyutu
 
   void _showFontSizeSlider() {
@@ -97,10 +98,10 @@ class _ReadFortuneViewState extends State<ReadFortuneView> {
         IconButton(
           onPressed: () async {
             _showDeleteDialog(context, () async {
-              AppNavigatorManager.instance.pop();
-              await MockFirebaseService().deleteFortune(widget.currentContent.id!);
+              Navigator.of(context).pop();
+              await ref.read(fortuneRepositoryProvider).delete(widget.currentContent.id!);
               if (context.mounted) LoadingDialog.hide(context);
-              AppNavigatorManager.instance.pop();
+              ref.read(appNavigatorProvider).pop();
             });
           },
           icon: const Icon(Icons.delete_forever_outlined),
@@ -120,7 +121,7 @@ void _showDeleteDialog(BuildContext context, VoidCallback onDelete) {
         actions: [
           TextButton(
             onPressed: () {
-              AppNavigatorManager.instance.pop();
+              Navigator.of(context).pop();
             },
             child: const Text("İptal"),
           ),

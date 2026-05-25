@@ -3,9 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fortuneapp/enums/gpt_content_type.dart';
 
 import '../../core/navigation/app_navigator.dart';
-import '../../core/navigation/app_navigator_manager.dart';
 import '../../core/widgets/loading_dialog.dart';
-import 'my_fortunes_view_model.dart';
+import 'my_fortunes_providers.dart';
 
 // Kullanıcının fal geçmişini listeleyen ekran.
 class MyFortunesView extends ConsumerWidget {
@@ -81,7 +80,7 @@ class MyFortunesView extends ConsumerWidget {
                           if (!isRead) {
                             await notifier.markAsRead(fortune.id!);
                           }
-                          AppNavigatorManager.instance.pushToPage(
+                          ref.read(appNavigatorProvider).pushToPage(
                             AppRoutes.readFortune,
                             arguments: {'currentContent': fortune},
                           );

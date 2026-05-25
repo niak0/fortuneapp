@@ -11,10 +11,12 @@ part 'gpt_service.g.dart';
 
 // OpenAI chat completion API'ını saran stateless servis.
 class GptService {
+  GptService({required this.apiKey, required this.model});
+
   final Dio dio = Dio();
-  final String _apiKey = Env.gptApiKey;
+  final String apiKey;
+  final String model;
   final String _baseUrl = 'https://api.openai.com/v1/chat/completions';
-  final String _model = Env.gptModel;
 
   // Tek bir kullanıcı mesajından chat completion alır.
   Future<String?> createMessage({
@@ -23,7 +25,7 @@ class GptService {
     FortuneTopic? fortuneTopic,
   }) async {
     final chatPost = ChatPost(
-      model: _model,
+      model: model,
       messages: [
         ChatMessage(role: 'system', content: contentType.systemMessageContent),
         ChatMessage(role: 'user', content: message),
@@ -49,7 +51,7 @@ class GptService {
         options: Options(
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer $_apiKey',
+            'Authorization': 'Bearer $apiKey',
           },
         ),
         data: chatPost.toJson(),
@@ -71,6 +73,7 @@ class GptService {
   }
 }
 
-// GptService DI provider'ı.
+// GptService DI provider'ı — Env'den config inject edilir.
 @Riverpod(keepAlive: true)
-GptService gptService(Ref ref) => GptService();
+GptService gptService(Ref ref) =>
+    GptService(apiKey: Env.gptApiKey, model: Env.gptModel);

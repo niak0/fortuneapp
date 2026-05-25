@@ -1,4 +1,4 @@
-import 'package:fortuneapp/core/models/current_user.dart';
+import 'package:fortuneapp/core/auth/current_user.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'gold_manager.g.dart';

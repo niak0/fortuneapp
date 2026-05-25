@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fortuneapp/core/navigation/app_navigator_manager.dart';
-import 'package:fortuneapp/features/profile_edit/profile_edit_view_model.dart';
+import 'package:fortuneapp/core/navigation/app_navigator.dart';
+import 'package:fortuneapp/features/profile_edit/profile_edit_providers.dart';
 import 'package:intl/intl.dart';
 
 import '../../core/widgets/loading_dialog.dart';
@@ -171,7 +171,7 @@ class ProfileEditView extends ConsumerWidget {
                   await notifier.saveUserChanges();
                   if (context.mounted) LoadingDialog.hide(context);
                   CustomSnackBar.show('Profil Güncellendi');
-                  AppNavigatorManager.instance.pop();
+                  ref.read(appNavigatorProvider).pop();
                 },
                 child: const Text('Güncelle'),
               ),

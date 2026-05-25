@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fortuneapp/core/widgets/custom_grid.dart';
 
-import '../../core/models/current_user.dart';
-import '../../core/navigation/app_navigator_manager.dart';
+import '../../core/auth/current_user.dart';
+import '../../core/navigation/app_navigator.dart';
 import 'model/home_items.dart';
 import 'widgets/build_stream_builder.dart';
 
@@ -37,7 +37,7 @@ class HomeView extends ConsumerWidget {
                   final item = HomeItemModel.homeItems[index];
                   return InkWell(
                     onTap: () =>
-                        AppNavigatorManager.instance.pushToPage(item.route),
+                        ref.read(appNavigatorProvider).pushToPage(item.route),
                     child: item.tile,
                   );
                 },

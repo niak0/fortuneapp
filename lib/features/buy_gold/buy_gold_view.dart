@@ -7,7 +7,7 @@ import 'package:fortuneapp/features/buy_gold/widgets/ad_card.dart';
 import 'package:fortuneapp/features/buy_gold/widgets/product_card.dart';
 
 import '../../core/widgets/custom_grid.dart';
-import 'buy_gold_view_model.dart';
+import 'buy_gold_providers.dart';
 
 // Altın satın alma ekranı.
 class BuyGoldView extends ConsumerWidget {

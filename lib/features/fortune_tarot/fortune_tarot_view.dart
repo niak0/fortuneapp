@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fortuneapp/core/navigation/app_navigator_manager.dart';
+import 'package:fortuneapp/core/navigation/app_navigator.dart';
 import 'package:fortuneapp/features/fortune_tarot/positioned_circle_container.dart';
 
 import '../../core/widgets/loading_dialog.dart';
-import 'fortune_tarot_view_model.dart';
+import 'fortune_tarot_providers.dart';
 
 // Tarot çekme ekranı.
 class FortuneTarotView extends ConsumerWidget {
@@ -41,7 +41,7 @@ class FortuneTarotView extends ConsumerWidget {
                   style: Theme.of(context).textTheme.headlineSmall),
               const SizedBox(height: 50),
               if (state.selectedCards.values.every((c) => c != null))
-                _buildElevatedButton(context, notifier),
+                _buildElevatedButton(context, ref, notifier),
             ],
           ),
         );
@@ -51,14 +51,14 @@ class FortuneTarotView extends ConsumerWidget {
 
   // Tarot devam butonu (yorumlamayı başlatır).
   Widget _buildElevatedButton(
-      BuildContext context, FortuneTarotViewModel notifier) {
+      BuildContext context, WidgetRef ref, FortuneTarotViewModel notifier) {
     return ElevatedButton(
       onPressed: () async {
         LoadingDialog.show(context);
         await notifier.handleSelectedCards();
         if (context.mounted) {
           LoadingDialog.hide(context);
-          AppNavigatorManager.instance.pop();
+          ref.read(appNavigatorProvider).pop();
         }
       },
       style: ElevatedButton.styleFrom(

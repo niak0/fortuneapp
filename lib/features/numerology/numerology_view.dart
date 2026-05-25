@@ -2,11 +2,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fortuneapp/core/navigation/app_navigator.dart';
-import 'package:fortuneapp/core/navigation/app_navigator_manager.dart';
 import 'package:fortuneapp/features/numerology/helpers/numerology_items.dart';
-import 'package:fortuneapp/features/numerology/numerology_view_model.dart';
+import 'package:fortuneapp/features/numerology/numerology_calculator.dart';
 
-import '../../core/models/current_user.dart';
+import '../../core/auth/current_user.dart';
 import '../../core/models/user_model.dart';
 
 // Kullanıcının numeroloji değerlerini gösteren ekran.
@@ -23,7 +22,7 @@ class NumerologyView extends ConsumerWidget {
         if (user == null) {
           return const Scaffold(body: Center(child: Text('Kullanıcı yok')));
         }
-        final viewModel = NumerologyViewModel(user.name, DateTime(1999, 01, 11))
+        final viewModel = NumerologyCalculator(user.name, DateTime(1999, 01, 11))
           ..calculate();
         return Scaffold(
           appBar: AppBar(title: const Text('Numeroloji')),
@@ -31,7 +30,7 @@ class NumerologyView extends ConsumerWidget {
             padding: const EdgeInsets.all(20.0),
             child: ListView(
               children: [
-                buildInfoListTile(user),
+                buildInfoListTile(ref, user),
                 const SizedBox(height: 20),
                 Card(
                   color: Theme.of(context).colorScheme.primary,
@@ -41,11 +40,11 @@ class NumerologyView extends ConsumerWidget {
                     trailing: Icon(Icons.info_outlined),
                   ),
                 ),
-                _buildCategoryCard(context, BirthDateCalculations.values, viewModel),
+                _buildCategoryCard(context, ref, BirthDateCalculations.values, viewModel),
                 const SizedBox(height: 20),
-                _buildCategoryCard(context, NameCalculations.values, viewModel),
+                _buildCategoryCard(context, ref, NameCalculations.values, viewModel),
                 const SizedBox(height: 20),
-                _buildCategoryCard(context, TimeCycles.values, viewModel),
+                _buildCategoryCard(context, ref, TimeCycles.values, viewModel),
                 const SizedBox(height: 20),
               ],
             ),
@@ -56,10 +55,10 @@ class NumerologyView extends ConsumerWidget {
   }
 
   // Kullanıcı bilgi satırı (profil editine yönlendirir).
-  ListTile buildInfoListTile(UserModel currentUser) {
+  ListTile buildInfoListTile(WidgetRef ref, UserModel currentUser) {
     return ListTile(
       onTap: () =>
-          AppNavigatorManager.instance.pushToPage(AppRoutes.profileEdit),
+          ref.read(appNavigatorProvider).pushToPage(AppRoutes.profileEdit),
       dense: true,
       title: const Text('Lütfen tam adınızı girin'),
       subtitle: Text('${currentUser.name}, ${currentUser.birthDate} '),
@@ -71,8 +70,9 @@ class NumerologyView extends ConsumerWidget {
   // Bir numeroloji kategorisini kart olarak çizer.
   Widget _buildCategoryCard(
     BuildContext context,
+    WidgetRef ref,
     List<NumerologyItem> items,
-    NumerologyViewModel viewModel,
+    NumerologyCalculator viewModel,
   ) {
     final theme = Theme.of(context);
     final title = items.first.title;
@@ -87,7 +87,7 @@ class NumerologyView extends ConsumerWidget {
         Card(
           color: color,
           child: ListTile(
-            onTap: () => AppNavigatorManager.instance
+            onTap: () => ref.read(appNavigatorProvider)
                 .pushToPage(AppRoutes.numerologyDetail, arguments: {
               'selectedItem': items.first,
               'values': values,
@@ -108,7 +108,7 @@ class NumerologyView extends ConsumerWidget {
                 ),
                 margin: const EdgeInsets.all(4),
                 child: InkWell(
-                  onTap: () => AppNavigatorManager.instance
+                  onTap: () => ref.read(appNavigatorProvider)
                       .pushToPage(AppRoutes.numerologyDetail, arguments: {
                     'selectedItem': items.first,
                     'values': values,
@@ -133,7 +133,7 @@ class NumerologyView extends ConsumerWidget {
                             print('${item.displayName} = $value');
                             print('$values');
                           }
-                          AppNavigatorManager.instance.pushToPage(
+                          ref.read(appNavigatorProvider).pushToPage(
                             AppRoutes.numerologyDetail,
                             arguments: {
                               'selectedItem': item,

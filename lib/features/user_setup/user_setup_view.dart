@@ -7,7 +7,7 @@ import 'step_widgets/name_step.dart';
 import 'step_widgets/relationship_step.dart';
 import 'step_widgets/work_status_step.dart';
 import 'step_widgets/zodiac_step.dart';
-import 'user_setup_view_model.dart';
+import 'user_setup_providers.dart';
 
 // Çok adımlı kullanıcı kurulum ekranı.
 class UserSetupView extends ConsumerStatefulWidget {

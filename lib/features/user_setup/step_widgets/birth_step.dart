@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-import '../user_setup_view_model.dart';
+import '../user_setup_providers.dart';
 
 // Kullanıcı kurulumu — doğum tarihi/saati adımı.
 class BirthStep extends ConsumerStatefulWidget {

@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fortuneapp/features/astrology/chinese_zodiac/animal_enum.dart';
-import '../../../core/models/current_user.dart';
+import '../../../core/auth/current_user.dart';
 
 // Kullanıcının doğum tarihine göre Çin burcunu gösteren ekran.
 class ChineseZodiac extends ConsumerWidget {

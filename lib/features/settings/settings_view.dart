@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fortuneapp/core/auth/auth_manager.dart';
+import 'package:fortuneapp/core/auth/auth_notifier.dart';
 import 'package:fortuneapp/core/navigation/app_navigator.dart';
-import 'package:fortuneapp/core/navigation/app_navigator_manager.dart';
 
 // Uygulama ayarları ekranı.
 class SettingsView extends ConsumerStatefulWidget {
@@ -25,7 +24,7 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
         title: const Text('Ayarlar'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => AppNavigatorManager.instance.pop(),
+          onPressed: () => ref.read(appNavigatorProvider).pop(),
         ),
       ),
       body: Padding(
@@ -45,9 +44,9 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
                 // TODO: Yardım sayfasına yönlendir
               }),
               _buildListTile('Çıkış Yap', () async {
-                await ref.read(authManagerProvider.notifier).signOut();
+                await ref.read(authProvider.notifier).signOut();
                 if (context.mounted) {
-                  AppNavigatorManager.instance.pushAndRemoveUntil(AppRoutes.login);
+                  ref.read(appNavigatorProvider).pushAndRemoveUntil(AppRoutes.login);
                 }
               }),
             ]),
@@ -151,9 +150,9 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
             TextButton(
               child: const Text('Sil', style: TextStyle(color: Colors.red)),
               onPressed: () async {
-                await ref.read(authManagerProvider.notifier).signOut();
+                await ref.read(authProvider.notifier).signOut();
                 if (context.mounted) {
-                  AppNavigatorManager.instance.pushAndRemoveUntil(AppRoutes.login);
+                  ref.read(appNavigatorProvider).pushAndRemoveUntil(AppRoutes.login);
                 }
               },
             ),

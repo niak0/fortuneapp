@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fortuneapp/core/auth/auth_manager.dart';
+import 'package:fortuneapp/core/auth/auth_notifier.dart';
 import 'package:fortuneapp/enums/drawer_items.dart';
 
 import '../../core/navigation/app_navigator.dart';
-import '../../core/navigation/app_navigator_manager.dart';
 
 // Uygulamanın yan çekmecesi (drawer).
 class SideBar extends ConsumerWidget {
@@ -20,15 +19,15 @@ class SideBar extends ConsumerWidget {
           actions: [
             TextButton(
               onPressed: () {
-                AppNavigatorManager.instance.pop();
+                Navigator.of(context).pop();
               },
               child: const Text("İptal"),
             ),
             TextButton(
               onPressed: () async {
-                AppNavigatorManager.instance.pop();
-                await ref.read(authManagerProvider.notifier).signOut();
-                AppNavigatorManager.instance.pushAndRemoveUntil(AppRoutes.login);
+                Navigator.of(context).pop();
+                await ref.read(authProvider.notifier).signOut();
+                ref.read(appNavigatorProvider).pushAndRemoveUntil(AppRoutes.login);
               },
               child: const Text("Çıkış Yap"),
             ),
@@ -48,15 +47,15 @@ class SideBar extends ConsumerWidget {
           actions: [
             TextButton(
               onPressed: () {
-                AppNavigatorManager.instance.pop();
+                Navigator.of(context).pop();
               },
               child: const Text("İptal"),
             ),
             TextButton(
               onPressed: () async {
-                AppNavigatorManager.instance.pop();
+                Navigator.of(context).pop();
                 // await context.read<AuthManager>().deleteUser();
-                // AppNavigatorManager.instance.pushAndRemoveUntil(AppRoutes.login);
+                // ref.read(appNavigatorProvider).pushAndRemoveUntil(AppRoutes.login);
               },
               child: const Text("Hesabı Sil", style: TextStyle(color: Colors.red, fontSize: 14)),
             ),
@@ -73,21 +72,21 @@ class SideBar extends ConsumerWidget {
         width: MediaQuery.of(context).size.width / 1.6,
         child: ListView(padding: const EdgeInsets.symmetric(vertical: 10), children: [
           DrawerItems.profile.customListTile(onTap: () {
-            AppNavigatorManager.instance.pushToPage(AppRoutes.profileEdit);
+            ref.read(appNavigatorProvider).pushToPage(AppRoutes.profileEdit);
           }),
           DrawerItems.addGold.customListTile(onTap: () {
-            AppNavigatorManager.instance.pushToPage(AppRoutes.buyCredits);
+            ref.read(appNavigatorProvider).pushToPage(AppRoutes.buyCredits);
           }),
           const Divider(),
           DrawerItems.feedback.customListTile(onTap: () {
-            AppNavigatorManager.instance.pushToPage(AppRoutes.settings);
+            ref.read(appNavigatorProvider).pushToPage(AppRoutes.settings);
           }),
           DrawerItems.contactUs.customListTile(onTap: () {}),
           const Divider(),
           DrawerItems.termsOfService.customListTile(onTap: () {}),
           DrawerItems.privacyPolicy.customListTile(onTap: () {}),
           // DrawerItems.settings.customListTile(onTap: () {
-          //   AppNavigatorManager.instance.pushToPage(AppRoutes.settings);
+          //   ref.read(appNavigatorProvider).pushToPage(AppRoutes.settings);
           // }),
           // Container(
           //   height: 200,

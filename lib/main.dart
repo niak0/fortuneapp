@@ -1,12 +1,12 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fortuneapp/core/utilitys/theme.dart';
-import 'package:fortuneapp/core/utils/connectivity_service.dart';
+import 'package:fortuneapp/core/utilities/theme.dart';
+import 'package:fortuneapp/core/utilities/connectivity_service.dart';
 
 import 'core/navigation/app_navigator.dart';
-import 'core/navigation/app_navigator_manager.dart';
-import 'core/utilitys/util.dart';
+import 'core/navigation/app_router.dart';
+import 'core/utilities/util.dart';
 import 'core/widgets/no_internet_dialog.dart';
 import 'firebase_options.dart';
 
@@ -18,7 +18,7 @@ void main() async {
 }
 
 // MaterialApp kökü; tema, route ve bağlantı katmanını kurar.
-class MyApp extends ConsumerWidget with AppNavigator {
+class MyApp extends ConsumerWidget with AppRouter {
   const MyApp({super.key});
 
   @override
@@ -31,7 +31,7 @@ class MyApp extends ConsumerWidget with AppNavigator {
       theme: theme.dark(),
       debugShowCheckedModeBanner: false,
       onGenerateRoute: onGenerateRoute,
-      navigatorKey: AppNavigatorManager.instance.navigatorGlobalKey,
+      navigatorKey: ref.watch(appNavigatorProvider).key,
       builder: (context, child) {
         return connectivity.maybeWhen(
           data: (connected) => connected

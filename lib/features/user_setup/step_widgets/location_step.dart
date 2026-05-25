@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../user_setup_view_model.dart';
+import '../user_setup_providers.dart';
 
 // Kullanıcı kurulumu — doğum yeri adımı.
 class LocationStep extends ConsumerStatefulWidget {

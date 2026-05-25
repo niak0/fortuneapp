@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/models/current_user.dart';
+import '../../core/auth/current_user.dart';
 import '../../core/navigation/app_navigator.dart';
-import '../../core/navigation/app_navigator_manager.dart';
 import '../sider_bar/sider_bar.dart';
-import 'navigation_bar_manager.dart';
+import 'navigation_bar_providers.dart';
 
 // Anasayfa + Fallarım sekmeleri arasında geçiş yapılan ana kabuk.
 class ProjectNavigationBar extends ConsumerStatefulWidget {
@@ -38,7 +37,7 @@ class _ProjectNavigationBarState extends ConsumerState<ProjectNavigationBar> {
         actions: [
           TextButton.icon(
             onPressed: () =>
-                AppNavigatorManager.instance.pushToPage(AppRoutes.buyCredits),
+                ref.read(appNavigatorProvider).pushToPage(AppRoutes.buyCredits),
             icon: const Icon(Icons.monetization_on_outlined),
             label: Text(userCoin.toString()),
           ),

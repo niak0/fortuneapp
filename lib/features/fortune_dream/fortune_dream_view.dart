@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fortuneapp/core/widgets/custom_button.dart';
 import 'package:fortuneapp/core/widgets/loading_dialog.dart';
 
-import '../../core/navigation/app_navigator_manager.dart';
+import '../../core/navigation/app_navigator.dart';
 import '../../core/widgets/snackbar.dart';
 import '../../generated/assets.dart';
 
-class FortuneDreamView extends StatelessWidget {
+class FortuneDreamView extends ConsumerWidget {
   const FortuneDreamView({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     TextEditingController controller = TextEditingController();
 
     return Scaffold(
@@ -55,7 +56,7 @@ class FortuneDreamView extends StatelessWidget {
                       if (context.mounted) {
                         LoadingDialog.hide(context);
                       }
-                      AppNavigatorManager.instance.pop();
+                      ref.read(appNavigatorProvider).pop();
                     } else {
                       if (context.mounted) {
                         CustomSnackBar.show("Lütfen tüm görüntüleri ve açıklamaları giriniz");

@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fortuneapp/core/logic/gold_controller.dart';
+import 'package:fortuneapp/core/utilities/gold_manager.dart';
 
 import '../../../core/navigation/app_navigator.dart';
-import '../../../core/navigation/app_navigator_manager.dart';
-import '../home_view_model.dart';
+import '../home_providers.dart';
 import 'dots_indicator.dart';
 
 // Yakın zamandaki falları (okunmamış/erişilemez) yatay swipe ile sunar.
@@ -28,7 +27,7 @@ class _BuildStreamBuilderState extends ConsumerState<BuildStreamBuilder> {
   Widget build(BuildContext context) {
     final asyncFortunes = ref.watch(homeViewModelProvider);
     final vm = ref.read(homeViewModelProvider.notifier);
-    final goldController = ref.read(goldControllerProvider);
+    final goldController = ref.read(goldManagerProvider);
 
     return asyncFortunes.maybeWhen(
       data: (fortunes) {
@@ -84,7 +83,7 @@ class _BuildStreamBuilderState extends ConsumerState<BuildStreamBuilder> {
                                 if (!isRead) {
                                   await vm.markAsRead(fortune.id ?? '');
                                 }
-                                AppNavigatorManager.instance.pushToPage(
+                                ref.read(appNavigatorProvider).pushToPage(
                                   AppRoutes.readFortune,
                                   arguments: {'currentContent': fortune},
                                 );

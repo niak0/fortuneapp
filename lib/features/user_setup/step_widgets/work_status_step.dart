@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../enums/work_status.dart';
-import '../user_setup_view_model.dart';
+import '../user_setup_providers.dart';
 
 // Kullanıcı kurulumu — çalışma durumu seçim adımı.
 class WorkStatusStep extends ConsumerWidget {

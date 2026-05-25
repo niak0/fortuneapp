@@ -2,12 +2,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fortuneapp/core/widgets/snackbar.dart';
-import 'package:fortuneapp/features/biorhythm/biorhythm_view_model.dart';
+import 'package:fortuneapp/features/biorhythm/biorhythm_providers.dart';
 import 'package:fortuneapp/features/biorhythm/enum/biorhythm_items.dart';
 import 'package:fortuneapp/features/biorhythm/helpers/circle_painter.dart';
 import 'package:fortuneapp/features/biorhythm/helpers/day_items.dart';
 
-import '../../core/models/current_user.dart';
+import '../../core/auth/current_user.dart';
 
 // Kullanıcının biyoritim grafiği ve yorumlarını gösteren ekran.
 class BiorhythmView extends ConsumerWidget {

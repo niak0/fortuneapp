@@ -1,26 +1,38 @@
 import 'package:flutter/material.dart';
 
 import 'app_navigator.dart';
+import 'app_router.dart';
 
-class AppNavigatorManager {
-  AppNavigatorManager._();
-  static AppNavigatorManager instance = AppNavigatorManager._();
-  final GlobalKey<NavigatorState> _navigatorGlobalKey = GlobalKey<NavigatorState>();
+// DEPRECATED: Yeni kodda `appNavigatorProvider` kullanın.
+// Bu facade sadece context-suz statik helper'lar (CustomSnackBar, LoadingDialog)
+// için tutuluyor; UI helper migration'ı bitince silinecek.
+class AppNavigatorManager implements AppNavigator {
+  AppNavigatorManager._(this._delegate);
 
-  GlobalKey<NavigatorState> get navigatorGlobalKey => _navigatorGlobalKey;
+  final AppNavigator _delegate;
 
-  Future<dynamic>? pushToPage(AppRoutes route, {Object? arguments}) {
-    return _navigatorGlobalKey.currentState?.pushNamed(route.path, arguments: arguments);
-    //pushToPage rota isteğini oluşturur, onGenerateRoute o isteği alır ve ilgili sayfayı döndürerek sayfayı açar.
-  }
+  static final AppNavigatorManager instance =
+      AppNavigatorManager._(RoutingNavigator(_managerKey));
 
-  Future<dynamic>? pushAndRemoveUntil(AppRoutes newRoute, {Object? arguments}) {
-    return _navigatorGlobalKey.currentState?.pushNamedAndRemoveUntil(newRoute.path, (Route<dynamic> route) => false, arguments: arguments,
-    );
-  }
+  static final GlobalKey<NavigatorState> _managerKey =
+      GlobalKey<NavigatorState>();
 
+  @override
+  GlobalKey<NavigatorState> get key => _delegate.key;
 
-  void pop([Object? result]) {
-    _navigatorGlobalKey.currentState?.pop(result);
-  }
+  GlobalKey<NavigatorState> get navigatorGlobalKey => _delegate.key;
+
+  @override
+  BuildContext? get currentContext => _delegate.currentContext;
+
+  @override
+  Future<dynamic>? pushToPage(AppRoutes route, {Object? arguments}) =>
+      _delegate.pushToPage(route, arguments: arguments);
+
+  @override
+  Future<dynamic>? pushAndRemoveUntil(AppRoutes route, {Object? arguments}) =>
+      _delegate.pushAndRemoveUntil(route, arguments: arguments);
+
+  @override
+  void pop([Object? result]) => _delegate.pop(result);
 }

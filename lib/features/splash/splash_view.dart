@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fortuneapp/core/widgets/loading_dialog.dart';
 
-import '../../core/models/current_user.dart';
+import '../../core/auth/current_user.dart';
 import '../../core/navigation/app_navigator.dart';
-import '../../core/navigation/app_navigator_manager.dart';
 
 // Açılış ekranı — CurrentUser hazır olunca anasayfaya yönlendirir.
 class SplashView extends ConsumerStatefulWidget {
@@ -24,7 +23,7 @@ class _SplashViewState extends ConsumerState<SplashView> {
       if (next is AsyncData) {
         _navigated = true;
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          AppNavigatorManager.instance.pushAndRemoveUntil(AppRoutes.home);
+          ref.read(appNavigatorProvider).pushAndRemoveUntil(AppRoutes.home);
         });
       }
     });

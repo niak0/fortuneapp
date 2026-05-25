@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fortuneapp/core/navigation/app_navigator.dart';
-import 'package:fortuneapp/core/navigation/app_navigator_manager.dart';
 import 'package:fortuneapp/core/widgets/loading_dialog.dart';
 import 'package:fortuneapp/core/widgets/snackbar.dart';
 import 'package:fortuneapp/enums/fortune_topic.dart';
 import 'package:fortuneapp/enums/relationship_status.dart';
 import 'package:fortuneapp/enums/work_status.dart';
 
-import '../../core/models/current_user.dart';
+import '../../core/auth/current_user.dart';
 import '../../core/widgets/custom_button.dart';
 import '../../core/widgets/custom_grid.dart';
-import 'fortune_coffee_view_model.dart';
+import 'fortune_coffee_providers.dart';
 import 'widgets/fortune_topic_card.dart';
 import 'widgets/photo_picker.dart';
 
@@ -67,7 +66,7 @@ class _FortuneCoffeeViewState extends ConsumerState<FortuneCoffeeView> {
                   _PhotoPickerRow(photos: state.photos, notifier: notifier),
                   const SizedBox(height: 10),
                   _buildUserInfoTextField(
-                    onTap: () => AppNavigatorManager.instance
+                    onTap: () => ref.read(appNavigatorProvider)
                         .pushToPage(AppRoutes.profileEdit),
                   ),
                   const SizedBox(height: 10),
@@ -85,7 +84,7 @@ class _FortuneCoffeeViewState extends ConsumerState<FortuneCoffeeView> {
                       LoadingDialog.show(context);
                       await notifier.getFortuneAndSaveFirebase(currentUser);
                       if (context.mounted) LoadingDialog.hide(context);
-                      AppNavigatorManager.instance.pop();
+                      ref.read(appNavigatorProvider).pop();
                     },
                   ),
                 ],
