@@ -9,7 +9,7 @@ part 'my_fortunes_providers.g.dart';
 @riverpod
 class MyFortunesViewModel extends _$MyFortunesViewModel {
   @override
-  Stream<List<ContentModel>> build() {
+  Stream<List<FortuneModel>> build() {
     return ref.watch(fortuneRepositoryProvider).watchAll();
   }
 

@@ -1,5 +1,6 @@
+import 'dart:developer' as developer;
+
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'package:fortuneapp/core/config/env.dart';
 import 'package:fortuneapp/enums/fortune_topic.dart';
 import 'package:fortuneapp/enums/gpt_content_type.dart';
@@ -9,16 +10,36 @@ import '../../core/models/gpt_model.dart';
 
 part 'gpt_service.g.dart';
 
-// OpenAI chat completion API'ını saran stateless servis.
-class GptService {
-  GptService({required this.apiKey, required this.model});
+const _logName = 'gpt_service';
 
-  final Dio dio = Dio();
+// Fal metni üreten servis için abstract interface (test'te fake'lenebilir).
+abstract class GptService {
+  Future<String?> createMessage({
+    required String message,
+    required ContentType contentType,
+    FortuneTopic? fortuneTopic,
+  });
+}
+
+// OpenAI chat completion API'ını saran stateless servis.
+class OpenAiGptService implements GptService {
+  OpenAiGptService({required this.apiKey, required this.model, Dio? dio})
+    : dio =
+          dio ??
+          Dio(
+            BaseOptions(
+              connectTimeout: const Duration(seconds: 15),
+              receiveTimeout: const Duration(seconds: 60),
+            ),
+          );
+
+  final Dio dio;
   final String apiKey;
   final String model;
   final String _baseUrl = 'https://api.openai.com/v1/chat/completions';
 
   // Tek bir kullanıcı mesajından chat completion alır.
+  @override
   Future<String?> createMessage({
     required String message,
     required ContentType contentType,
@@ -35,10 +56,15 @@ class GptService {
     try {
       final result = await sendMessage(chatPost);
       if (result != null && result.isNotEmpty) return result;
-      if (kDebugMode) print('Empty message');
+      developer.log('Boş mesaj döndü', name: _logName, level: 900);
       return null;
-    } catch (e) {
-      if (kDebugMode) print('Error fetching ${contentType.name}: $e');
+    } catch (e, s) {
+      developer.log(
+        '${contentType.name} alınamadı',
+        name: _logName,
+        error: e,
+        stackTrace: s,
+      );
     }
     return null;
   }
@@ -64,10 +90,15 @@ class GptService {
             responseData['choices'][0]['message']['content'] != null) {
           return responseData['choices'][0]['message']['content'] as String;
         }
-        if (kDebugMode) print('Unexpected response structure');
+        developer.log('Beklenmeyen yanıt yapısı', name: _logName, level: 900);
       }
-    } catch (e) {
-      if (kDebugMode) print('error: $e');
+    } catch (e, s) {
+      developer.log(
+        'sendMessage HATA',
+        name: _logName,
+        error: e,
+        stackTrace: s,
+      );
     }
     return null;
   }
@@ -76,4 +107,4 @@ class GptService {
 // GptService DI provider'ı — Env'den config inject edilir.
 @Riverpod(keepAlive: true)
 GptService gptService(Ref ref) =>
-    GptService(apiKey: Env.gptApiKey, model: Env.gptModel);
+    OpenAiGptService(apiKey: Env.gptApiKey, model: Env.gptModel);

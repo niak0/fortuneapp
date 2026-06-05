@@ -10,7 +10,7 @@ class CustomFutureButton extends StatelessWidget {
 
   CustomFutureButton({required this.onPressed, required this.title, super.key});
 
-  _onPressed() async {
+  Future<void> _onPressed() async {
     _isLoading.value = true;
     try {
       await onPressed();
@@ -27,17 +27,15 @@ class CustomFutureButton extends StatelessWidget {
         return SizedBox(
           width: double.infinity,
           child: ElevatedButton(
-            onPressed: isLoading
-                ? null
-                : _onPressed,
+            onPressed: isLoading ? null : _onPressed,
             child: isLoading
-                ? const CircularProgressIndicator(color: Colors.white)
+                ? CircularProgressIndicator(
+                    color: Theme.of(context).colorScheme.onPrimary,
+                  )
                 : Text(title),
           ),
         );
       },
     );
   }
-
-
 }

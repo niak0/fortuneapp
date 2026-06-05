@@ -7,8 +7,6 @@ extension GenderOptionsExtension on GenderOption {
         return "Erkek";
       case GenderOption.woman:
         return "Kadın";
-      default:
-        return "";
     }
   }
 }

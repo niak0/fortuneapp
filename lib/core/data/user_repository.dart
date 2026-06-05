@@ -8,6 +8,11 @@ part 'user_repository.g.dart';
 // Kullanıcı veri erişimi için abstract interface — testte override edilebilir.
 abstract class UserRepository {
   Future<UserModel?> fetchCurrent();
+
+  // Profil varsa döner; yoksa (yeni anon kullanıcı) [createDefault] ile
+  // oluşturup Firestore'a yazar. Aktif kullanıcı yoksa null döner.
+  Future<UserModel?> fetchOrCreate(UserModel Function() createDefault);
+
   Future<void> update(UserModel user);
 }
 

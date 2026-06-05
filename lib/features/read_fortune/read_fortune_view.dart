@@ -4,12 +4,13 @@ import 'package:fortuneapp/core/data/fortune_repository.dart';
 import 'package:fortuneapp/core/navigation/app_navigator.dart';
 import 'package:fortuneapp/core/widgets/loading_dialog.dart';
 import '../../core/models/fortune_model.dart';
+import '../../enums/gpt_content_type.dart';
 import 'font_size_slider.dart';
 
 class ReadFortuneView extends ConsumerStatefulWidget {
   const ReadFortuneView({super.key, required this.currentContent});
 
-  final ContentModel currentContent;
+  final FortuneModel currentContent;
 
   @override
   ConsumerState<ReadFortuneView> createState() => _ReadFortuneViewState();
@@ -46,10 +47,17 @@ class _ReadFortuneViewState extends ConsumerState<ReadFortuneView> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "${widget.currentContent.fortuneType!} - ${widget.currentContent.fortuneTopic ?? ""}",
+                "${widget.currentContent.fortuneType?.displayName ?? ""}"
+                "${widget.currentContent.fortuneTopic != null ? " - ${widget.currentContent.fortuneTopic!.displayName}" : ""}",
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
-              Text(widget.currentContent.formattedDate, style: const TextStyle(fontSize: 20.0, color: Colors.white)),
+              Text(
+                widget.currentContent.formattedDate,
+                style: TextStyle(
+                  fontSize: 20.0,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ),
               const SizedBox(height: 20),
               Expanded(
                 child: SingleChildScrollView(
@@ -59,22 +67,46 @@ class _ReadFortuneViewState extends ConsumerState<ReadFortuneView> {
                       widget.currentContent.fortune != null
                           ? SelectableText(
                               widget.currentContent.fortune!,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium
-                                  ?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: _fontSize),
+                              style: Theme.of(context).textTheme.bodyMedium
+                                  ?.copyWith(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurfaceVariant,
+                                    fontSize: _fontSize,
+                                  ),
                               textAlign: TextAlign.left,
                             )
-                          : const Text(
+                          : Text(
                               'Falınız yüklenemedi.',
-                              style: TextStyle(fontSize: 16.0, color: Colors.red),
+                              style: TextStyle(
+                                fontSize: 16.0,
+                                color: Theme.of(context).colorScheme.error,
+                              ),
                             ),
                       Container(
-                        width: MediaQuery.of(context).size.width * 10,
+                        width: double.infinity,
                         height: 150,
-                        color: Colors.brown,
-                        child: const Center(child: Text("REKLAM")),
-                      )
+                        decoration: BoxDecoration(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.surfaceContainerHigh,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: Theme.of(context).colorScheme.outlineVariant,
+                          ),
+                        ),
+                        child: Center(
+                          child: Text(
+                            "REKLAM",
+                            style: TextStyle(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurfaceVariant,
+                              letterSpacing: 2,
+                            ),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -91,15 +123,18 @@ class _ReadFortuneViewState extends ConsumerState<ReadFortuneView> {
       elevation: 0,
       actions: [
         IconButton(
-            onPressed: () async {
-              _showFontSizeSlider();
-            },
-            icon: const Icon(Icons.format_size_outlined)),
+          onPressed: () async {
+            _showFontSizeSlider();
+          },
+          icon: const Icon(Icons.format_size_outlined),
+        ),
         IconButton(
           onPressed: () async {
             _showDeleteDialog(context, () async {
               Navigator.of(context).pop();
-              await ref.read(fortuneRepositoryProvider).delete(widget.currentContent.id!);
+              await ref
+                  .read(fortuneRepositoryProvider)
+                  .delete(widget.currentContent.id!);
               if (context.mounted) LoadingDialog.hide(context);
               ref.read(appNavigatorProvider).pop();
             });

@@ -28,8 +28,12 @@ class CardModel {
       name: map['name'] as String?,
       number: map['number'] as String?,
       img: map['img'] as String?,
-      fortuneTelling: map['fortuneTelling'] != null ? List<String>.from(map['fortuneTelling']) : [],
-      keywords: map['keywords'] != null ? List<String>.from(map['keywords']) : [],
+      fortuneTelling: map['fortuneTelling'] != null
+          ? List<String>.from(map['fortuneTelling'])
+          : [],
+      keywords: map['keywords'] != null
+          ? List<String>.from(map['keywords'])
+          : [],
     );
   }
 }

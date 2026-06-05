@@ -4,7 +4,8 @@ import '../navigation/app_navigator_manager.dart';
 
 class CustomSnackBar {
   static void show(String message) {
-    final currentContext = AppNavigatorManager.instance.navigatorGlobalKey.currentContext;
+    final currentContext =
+        AppNavigatorManager.instance.navigatorGlobalKey.currentContext;
     if (currentContext != null) {
       final snackBar = SnackBar(
         content: Text(

@@ -3,6 +3,8 @@ import 'dart:developer' as developer;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb;
 
+import '../../enums/fortune_topic.dart';
+import '../../enums/gpt_content_type.dart';
 import '../models/fortune_model.dart';
 import 'fortune_repository.dart';
 
@@ -13,8 +15,8 @@ class FirestoreFortuneRepository implements FortuneRepository {
   FirestoreFortuneRepository({
     FirebaseFirestore? firestore,
     fb.FirebaseAuth? auth,
-  })  : _firestore = firestore ?? FirebaseFirestore.instance,
-        _auth = auth ?? fb.FirebaseAuth.instance;
+  }) : _firestore = firestore ?? FirebaseFirestore.instance,
+       _auth = auth ?? fb.FirebaseAuth.instance;
 
   final FirebaseFirestore _firestore;
   final fb.FirebaseAuth _auth;
@@ -25,29 +27,16 @@ class FirestoreFortuneRepository implements FortuneRepository {
       developer.log('coll: uid yok', name: _logName);
       return null;
     }
-    return _firestore
-        .collection('users')
-        .doc(uid)
-        .collection('fortunes');
+    return _firestore.collection('users').doc(uid).collection('fortunes');
   }
 
-  ContentModel _fromDoc(QueryDocumentSnapshot<Map<String, dynamic>> doc) {
-    final data = doc.data();
-    return ContentModel(
-      id: doc.id,
-      createdTime: (data['createdTime'] as Timestamp?)?.toDate(),
-      unlockTime: (data['unlockTime'] as Timestamp?)?.toDate(),
-      fortune: data['fortune'] as String?,
-      userId: data['userId'] as String?,
-      fortuneType: data['fortuneType'] as String?,
-      fortuneTopic: data['fortuneTopic'] as String?,
-      isRead: data['isRead'] as bool? ?? false,
-      isAccessible: data['isAccessible'] as bool? ?? false,
-    );
+  FortuneModel _fromDoc(QueryDocumentSnapshot<Map<String, dynamic>> doc) {
+    // Converter'lar Timestamp ve enum string'lerini güvenle çözer.
+    return FortuneModel.fromJson(doc.data())..id = doc.id;
   }
 
   @override
-  Stream<List<ContentModel>> watchAll() {
+  Stream<List<FortuneModel>> watchAll() {
     final coll = _coll();
     if (coll == null) return const Stream.empty();
     return coll
@@ -57,7 +46,7 @@ class FirestoreFortuneRepository implements FortuneRepository {
   }
 
   @override
-  Future<List<ContentModel>> fetchAll() async {
+  Future<List<FortuneModel>> fetchAll() async {
     final coll = _coll();
     if (coll == null) return const [];
     final snap = await coll.orderBy('createdTime', descending: true).get();
@@ -67,8 +56,8 @@ class FirestoreFortuneRepository implements FortuneRepository {
   @override
   Future<bool> add({
     required String content,
-    required String contentType,
-    required String? fortuneTopic,
+    required ContentType contentType,
+    FortuneTopic? fortuneTopic,
   }) async {
     final coll = _coll();
     if (coll == null) return false;
@@ -76,8 +65,8 @@ class FirestoreFortuneRepository implements FortuneRepository {
       final now = DateTime.now();
       await coll.add({
         'fortune': content,
-        'fortuneType': contentType,
-        'fortuneTopic': fortuneTopic,
+        'fortuneType': contentType.name,
+        'fortuneTopic': fortuneTopic?.name,
         'createdTime': Timestamp.fromDate(now),
         'unlockTime': Timestamp.fromDate(now),
         'isRead': false,
@@ -93,17 +82,36 @@ class FirestoreFortuneRepository implements FortuneRepository {
   }
 
   @override
-  Future<void> setAccess(String fortuneId) async {
-    await _coll()?.doc(fortuneId).update({'isAccessible': true});
-  }
+  Future<void> setAccess(String fortuneId) => _mutate(
+    'setAccess',
+    (coll) => coll.doc(fortuneId).update({'isAccessible': true}),
+  );
 
   @override
-  Future<void> markAsRead(String fortuneId) async {
-    await _coll()?.doc(fortuneId).update({'isRead': true});
-  }
+  Future<void> markAsRead(String fortuneId) => _mutate(
+    'markAsRead',
+    (coll) => coll.doc(fortuneId).update({'isRead': true}),
+  );
 
   @override
-  Future<void> delete(String documentId) async {
-    await _coll()?.doc(documentId).delete();
+  Future<void> delete(String documentId) =>
+      _mutate('delete', (coll) => coll.doc(documentId).delete());
+
+  // Koleksiyon yoksa uyarı, hata olursa hatayı loglar — sessizce yutmaz.
+  Future<void> _mutate(
+    String op,
+    Future<void> Function(CollectionReference<Map<String, dynamic>> coll)
+    action,
+  ) async {
+    final coll = _coll();
+    if (coll == null) {
+      developer.log('$op atlandı: uid yok', name: _logName, level: 900);
+      return;
+    }
+    try {
+      await action(coll);
+    } catch (e, s) {
+      developer.log('$op HATA', name: _logName, error: e, stackTrace: s);
+    }
   }
 }

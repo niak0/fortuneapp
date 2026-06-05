@@ -2,9 +2,16 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/services.dart';
+import 'package:fortuneapp/enums/gpt_content_type.dart';
 import 'package:fortuneapp/features/fortune_tarot/tarot_model.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../core/auth/current_user.dart';
+import '../../core/data/fortune_repository.dart';
+import '../../core/network/gpt_service.dart';
+import '../../core/network/prompt_builder.dart';
+import '../../core/ui/ui_helper.dart';
+import '../../core/utilities/gold_manager.dart';
 import 'fortune_tarot_state.dart';
 
 export 'fortune_tarot_state.dart';
@@ -16,8 +23,9 @@ part 'fortune_tarot_providers.g.dart';
 class FortuneTarotViewModel extends _$FortuneTarotViewModel {
   @override
   Future<FortuneTarotState> build() async {
-    final jsonString =
-        await rootBundle.loadString('assets/tarot/tarot-images.json');
+    final jsonString = await rootBundle.loadString(
+      'assets/tarot/tarot-images.json',
+    );
     final Map<String, dynamic> jsonResponse = json.decode(jsonString);
     final cards = (jsonResponse['cards'] as List)
         .map((card) => CardModel.fromMap(card))
@@ -57,8 +65,47 @@ class FortuneTarotViewModel extends _$FortuneTarotViewModel {
     state = AsyncData(current.copyWith(selectedCards: updated));
   }
 
-  // Seçilen kartları işler (mock async).
-  Future<void> handleSelectedCards() async {
-    await Future.delayed(const Duration(seconds: 2));
+  // Seçilen kartlardan GPT yorumu alır, kaydeder ve altını düşer.
+  Future<bool> handleSelectedCards() async {
+    final current = state.value;
+    final cards = current?.cards;
+    if (current == null || cards == null) return false;
+
+    final user = ref.read(currentUserProvider).value;
+    if (user == null) return false;
+
+    final ui = ref.read(uiHelperProvider);
+    final gold = ref.read(goldManagerProvider);
+    if (!gold.checkGoldAndProceed(kFortuneCost)) {
+      ui.showSnackBar('Yeterli altının yok');
+      return false;
+    }
+
+    final selected = current.selectedCards.entries
+        .where((e) => e.value != null)
+        .map((e) => '${e.key}: ${cards[e.value!].name}')
+        .join(', ');
+    final prompt =
+        '${buildUserContext(user)}. Seçilen tarot kartları -> $selected. '
+        'Bu üç kartlık (geçmiş-şimdi-gelecek) açılımı yorumla.';
+
+    final text = await ref
+        .read(gptServiceProvider)
+        .createMessage(message: prompt, contentType: ContentType.tarot);
+    if (text == null) {
+      ui.showSnackBar('Fal alınamadı, lütfen tekrar dene');
+      return false;
+    }
+
+    final ok = await ref
+        .read(fortuneRepositoryProvider)
+        .add(content: text, contentType: ContentType.tarot);
+    if (!ok) {
+      ui.showSnackBar('Fal kaydedilemedi');
+      return false;
+    }
+
+    await gold.decreaseGold(kFortuneCost);
+    return true;
   }
 }

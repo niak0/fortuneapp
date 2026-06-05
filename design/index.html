@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="tr" data-theme="candlelight">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nâsip · Mistik Tema Prototipi</title>
+
+  <!-- Karakterli tipografi: kazınmış serif başlık + zarif italik + temiz gövde -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Jost:wght@400;500;600&display=swap"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="css/tokens.css" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/components.css" />
+</head>
+<body>
+  <!-- Telefon çerçevesi (Flutter ekranı mockup'ı) -->
+  <div class="phone">
+    <div class="phone__screen">
+      <div class="phone__notch"></div>
+
+      <!-- Atmosfer katmanları -->
+      <div class="stars"></div>
+      <div class="screen-glow"></div>
+      <div class="grain"></div>
+
+      <!-- Tema seçici (modüler tema demosu) -->
+      <div class="theme-switch" id="themeSwitch"></div>
+
+      <div class="app">
+        <div class="app__scroll">
+
+          <!-- Üst çubuk -->
+          <header class="topbar" data-reveal style="--rd:.05s">
+            <div class="brand">
+              <span class="brand__mark" id="brandMark"></span>
+              <span class="brand__name">Nâsip</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <span class="coin"><span id="coinIcon"></span>24</span>
+              <button class="avatar" id="avatarIcon" aria-label="Profil"></button>
+            </div>
+          </header>
+
+          <!-- Kayıt teşvik afişi -->
+          <div class="notice" id="notice" data-reveal style="--rd:.12s">
+            <span class="notice__icon" id="noticeIcon"></span>
+            <span class="notice__text">
+              <b>Kaderini koru.</b> Misafir hesaptasın — fal geçmişin
+              kaybolabilir. Giriş yap.
+            </span>
+            <span class="notice__cta" id="noticeCta"></span>
+          </div>
+
+          <!-- Aktif fal balonu (canlı geri sayım) -->
+          <section class="active" data-reveal style="--rd:.2s">
+            <div class="active__ring">
+              <svg width="72" height="72">
+                <circle id="ringTrack" class="active__ring-track" cx="36" cy="36" r="32" fill="none" stroke-width="3"/>
+                <circle id="ringFill" class="active__ring-fill" cx="36" cy="36" r="32" fill="none" stroke-width="3"/>
+              </svg>
+              <span class="active__cup" id="cupIcon"></span>
+            </div>
+            <div class="active__body">
+              <div class="active__eyebrow" id="activeEyebrow">YORUMLANIYOR</div>
+              <div class="active__title" id="activeTitle">Kahve falın demleniyor</div>
+              <div class="active__sub" id="activeSub"></div>
+              <button class="btn-accel">
+                <span id="accelIcon"></span> Hızlandır · 1
+              </button>
+            </div>
+          </section>
+
+          <!-- Selamlama -->
+          <div class="greeting" data-reveal style="--rd:.3s">
+            <div class="greeting__hi">İyi akşamlar,</div>
+            <div class="greeting__name">Okan</div>
+          </div>
+
+          <!-- Bölüm başlığı -->
+          <div class="section-head" data-reveal style="--rd:.36s">
+            <span class="section-head__star" id="headStar"></span>
+            <span class="section-head__title">Kehanet Kapıları</span>
+            <span class="section-head__line"></span>
+          </div>
+
+          <!-- Listeleme: kategori ızgarası -->
+          <div class="grid" id="grid"></div>
+
+        </div>
+
+        <!-- Alt navigasyon -->
+        <nav class="nav">
+          <button class="nav__btn is-active" id="navHome" aria-label="Anasayfa"></button>
+          <button class="nav__btn" id="navScroll" aria-label="Geçmiş"></button>
+          <button class="nav__btn" id="navStore" aria-label="Altın"></button>
+          <button class="nav__btn" id="navProfile" aria-label="Profil"></button>
+        </nav>
+      </div>
+
+      <!-- Giriş alt sayfası -->
+      <div class="sheet-scrim" id="scrim"></div>
+      <div class="sheet" id="sheet">
+        <div class="sheet__grip"></div>
+        <div class="sheet__title">Yıldızlar seni tanısın</div>
+        <p class="sheet__sub">
+          Giriş yap; fal geçmişin ve altınların her cihazda yanında kalsın.
+        </p>
+        <button class="sheet__btn"><span id="appleIcon"></span> Apple ile devam et</button>
+        <button class="sheet__btn"><span id="googleIcon"></span> Google ile devam et</button>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

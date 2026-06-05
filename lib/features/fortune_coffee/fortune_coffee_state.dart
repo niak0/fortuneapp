@@ -11,9 +11,9 @@ class FortuneCoffeeState {
   });
 
   factory FortuneCoffeeState.initial() => const FortuneCoffeeState(
-        photos: ['', '', ''],
-        selectedFortuneTopic: null,
-      );
+    photos: ['', '', ''],
+    selectedFortuneTopic: null,
+  );
 
   bool get isValid =>
       !photos.any((p) => p.isEmpty) && selectedFortuneTopic != null;
@@ -22,11 +22,10 @@ class FortuneCoffeeState {
     List<String>? photos,
     FortuneTopic? selectedFortuneTopic,
     bool clearTopic = false,
-  }) =>
-      FortuneCoffeeState(
-        photos: photos ?? this.photos,
-        selectedFortuneTopic: clearTopic
-            ? null
-            : (selectedFortuneTopic ?? this.selectedFortuneTopic),
-      );
+  }) => FortuneCoffeeState(
+    photos: photos ?? this.photos,
+    selectedFortuneTopic: clearTopic
+        ? null
+        : (selectedFortuneTopic ?? this.selectedFortuneTopic),
+  );
 }

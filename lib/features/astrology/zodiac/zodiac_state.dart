@@ -17,10 +17,9 @@ class ZodiacState {
     List<ZodiacModel>? zodiacModels,
     ZodiacModel? selectedZodiac,
     ZodiacSegments? selectedSegment,
-  }) =>
-      ZodiacState(
-        zodiacModels: zodiacModels ?? this.zodiacModels,
-        selectedZodiac: selectedZodiac ?? this.selectedZodiac,
-        selectedSegment: selectedSegment ?? this.selectedSegment,
-      );
+  }) => ZodiacState(
+    zodiacModels: zodiacModels ?? this.zodiacModels,
+    selectedZodiac: selectedZodiac ?? this.selectedZodiac,
+    selectedSegment: selectedSegment ?? this.selectedSegment,
+  );
 }

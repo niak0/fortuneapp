@@ -33,7 +33,7 @@ class _ProjectNavigationBarState extends ConsumerState<ProjectNavigationBar> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(navBarItems[currentIndex].label ?? 'null'),
+        title: Text(navBarItems[currentIndex].label ?? ''),
         actions: [
           TextButton.icon(
             onPressed: () =>
@@ -50,8 +50,9 @@ class _ProjectNavigationBarState extends ConsumerState<ProjectNavigationBar> {
             child: PageView(
               physics: const NeverScrollableScrollPhysics(),
               controller: _pageController,
-              onPageChanged: (index) =>
-                  ref.read(navigationBarViewModelProvider.notifier).setIndex(index),
+              onPageChanged: (index) => ref
+                  .read(navigationBarViewModelProvider.notifier)
+                  .setIndex(index),
               children: navBarPages,
             ),
           ),

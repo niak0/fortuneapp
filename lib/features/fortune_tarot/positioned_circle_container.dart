@@ -22,7 +22,8 @@ class PositionedCircleContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double currentAngle = ((2 * pi * index / totalContainers) + angle) * 2;
+    final double currentAngle =
+        ((2 * pi * index / totalContainers) + angle) * 2;
     // Kartın genişlik ve yüksekliğini dinamik olarak ayarlıyoruz
     const double cardWidth = 100;
     const double cardHeight = 120;

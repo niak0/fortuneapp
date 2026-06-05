@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fortuneapp/core/theme/mystic_tokens.dart';
 import 'package:fortuneapp/enums/zodiac_elements.dart';
 import 'package:fortuneapp/enums/zodiac_sign.dart';
 import 'package:fortuneapp/features/astrology/zodiac/zodiac_model.dart';
@@ -29,7 +30,7 @@ class ZodiacView extends ConsumerWidget {
                 ZodiacDropdown(state: state),
                 ZodiacInfos(state: state),
                 ZodiacScores(state: state),
-                const Divider(thickness: 0.5, color: Colors.grey),
+                const Divider(thickness: 0.5),
                 ZodiacSegmented(state: state),
               ],
             ),
@@ -54,30 +55,30 @@ class ZodiacDropdown extends ConsumerWidget {
       title: Text(state.selectedZodiac?.dateRange ?? 'Veri yok'),
       leading: Text(
         ZodiacSign.values
-                .firstWhere(
-                  (z) => z.name == state.selectedZodiac?.sign,
-                  orElse: () => ZodiacSign.aries,
-                )
-                .symbol ??
-            state.selectedZodiac?.sign ??
-            'Aries',
+            .firstWhere(
+              (z) => z.name == state.selectedZodiac?.sign,
+              orElse: () => ZodiacSign.aries,
+            )
+            .symbol,
         style: Theme.of(context).textTheme.headlineLarge,
       ),
       trailing: DropdownButton<ZodiacModel>(
         value: state.selectedZodiac,
         underline: const SizedBox(),
         items: state.zodiacModels
-            .map((item) => DropdownMenuItem(
-                  value: item,
-                  child: Text(
-                    ZodiacSign.values
-                        .firstWhere(
-                          (z) => z.name == item.sign,
-                          orElse: () => ZodiacSign.aries,
-                        )
-                        .turkishName,
-                  ),
-                ))
+            .map(
+              (item) => DropdownMenuItem(
+                value: item,
+                child: Text(
+                  ZodiacSign.values
+                      .firstWhere(
+                        (z) => z.name == item.sign,
+                        orElse: () => ZodiacSign.aries,
+                      )
+                      .turkishName,
+                ),
+              ),
+            )
             .toList(),
         onChanged: (value) {
           if (value != null) notifier.setSelectedZodiac(value);
@@ -121,14 +122,17 @@ class ZodiacScores extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tokens = MysticTokens.of(context);
+    final trackColor = Theme.of(context).colorScheme.surfaceContainerHighest;
     return Column(
       children: ZodiacElements.values.map((element) {
         final value = state.selectedZodiac?.getValue(element) ?? 0;
+        final color = _elementColor(tokens, element);
         return ListTile(
           contentPadding: EdgeInsets.zero,
           dense: true,
           title: Text(element.displayName),
-          leading: Icon(element.icon, color: element.color),
+          leading: Icon(element.icon, color: color),
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -138,8 +142,8 @@ class ZodiacScores extends StatelessWidget {
                 width: 100,
                 child: LinearProgressIndicator(
                   value: value / 10,
-                  color: element.color,
-                  backgroundColor: Colors.grey[300],
+                  color: color,
+                  backgroundColor: trackColor,
                 ),
               ),
             ],
@@ -147,6 +151,15 @@ class ZodiacScores extends StatelessWidget {
         );
       }).toList(),
     );
+  }
+
+  // Burç skoru elementini aktif temanın semantik rengine eşler.
+  Color _elementColor(MysticTokens tokens, ZodiacElements element) {
+    return switch (element) {
+      ZodiacElements.health => tokens.health,
+      ZodiacElements.love => tokens.love,
+      ZodiacElements.money => tokens.money,
+    };
   }
 }
 
@@ -167,13 +180,15 @@ class ZodiacSegmented extends ConsumerWidget {
           SegmentedButton<ZodiacSegments>(
             showSelectedIcon: false,
             segments: ZodiacSegments.values
-                .map((segment) => ButtonSegment(
-                      value: segment,
-                      label: Text(
-                        segment.displayName,
-                        style: Theme.of(context).textTheme.labelSmall,
-                      ),
-                    ))
+                .map(
+                  (segment) => ButtonSegment(
+                    value: segment,
+                    label: Text(
+                      segment.displayName,
+                      style: Theme.of(context).textTheme.labelSmall,
+                    ),
+                  ),
+                )
                 .toList(),
             selected: {state.selectedSegment},
             onSelectionChanged: (value) =>
@@ -183,8 +198,8 @@ class ZodiacSegmented extends ConsumerWidget {
             state.selectedZodiac?.getComment(state.selectedSegment) ??
                 'Veri yok',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
           ),
         ],
       ),

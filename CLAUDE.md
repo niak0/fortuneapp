@@ -21,12 +21,12 @@ Flutter 3.5+ / Dart, **Riverpod 3 + repository pattern** üzerine kurulu feature
 - `core/` — paylaşılan altyapı:
   - `auth/` — `auth_notifier.dart` (`@Riverpod(keepAlive: true)` `AuthNotifier`), `current_user.dart` (AsyncNotifier).
   - `config/env.dart` — build-time GPT config (gitignored, `env.example.dart` var).
-  - `data/` — **Repository layer** (abstract + Mock impl + provider): `user_repository.dart`, `fortune_repository.dart`, `zodiac_repository.dart`, `auth_repository.dart`. Notifier'lar veri için bunları kullanır, statik `MockService` bağımlılığı yoktur.
+  - `data/` — **Repository layer** (abstract + impl + provider): `user_repository.dart`, `fortune_repository.dart`, `zodiac_repository.dart`, `auth_repository.dart`, `settings_repository.dart`. Production impl'leri gerçek Firebase/SharedPreferences kullanır (`FirestoreUserRepository`, `FirestoreFortuneRepository`, `FirebaseAuthRepository`, `SharedPreferencesSettingsRepository`). Notifier'lar veri için bunları kullanır, statik `MockService` bağımlılığı yoktur.
   - `models/` — saf data model (`UserModel`, `FortuneModel`, `GptModel`).
-  - `navigation/` — `app_router.dart` (`AppRouter` mixin + `AppRoutes` enum + `onGenerateRoute`), `app_navigator.dart` (`AppNavigator` abstract + `RoutingNavigator` impl + `appNavigatorProvider`). Eski `app_navigator_manager.dart` legacy facade (sadece `CustomSnackBar`/`LoadingDialog` statik helper'ları için tutuluyor; UI helper'a tamamen geçince silinecek).
-  - `network/` — `gpt_service.dart` (`apiKey`/`model` inject edilir, Env'den provider'da çekilir), `mock_service.dart` (sadece repository içlerinden çağrılır — feature'lar direkt import etmez).
+  - `navigation/` — `app_router.dart` (`go_router` tabanlı: `AppRoutes` enum + `goRouterProvider` → `GoRouter`, `redirect` + `refreshListenable` ile auth/bootstrap sync), `app_navigator.dart` (`AppNavigator` abstract + `GoRouterAppNavigator` impl + `appNavigatorProvider`). Eski `app_navigator_manager.dart` legacy facade (sadece `CustomSnackBar`/`LoadingDialog` statik helper'ları için tutuluyor; UI helper'a tamamen geçince silinecek).
+  - `network/` — `gpt_service.dart` (`apiKey`/`model`/`dio` inject edilir; `apiKey`/`model` Env'den provider'da çekilir, `dio` testte fake'lenebilir, connect/receive timeout'lu).
   - `ui/ui_helper.dart` — `UiHelper` abstract + `MaterialUiHelper` impl + provider (`showSnackBar`, `showLoading`, `hideLoading`). Notifier'lar yan etki için bunu kullanır.
-  - `utilities/` — `connectivity_service.dart` (StreamNotifier), `gold_manager.dart`, `theme.dart`, `util.dart`.
+  - `utilities/` — `connectivity_service.dart` (StreamNotifier, gerçek `connectivity_plus` ile ağ durumu yayınlar), `gold_manager.dart`, `theme.dart`, `util.dart`.
   - `widgets/` — paylaşılan UI (LoadingDialog/CustomSnackBar legacy statik helper'lar dahil).
 - `features/<feature>/` — RIVERPOD.md §2 dosya bölünmesi:
   - `<feature>_state.dart` — composite state class + `copyWith` (sade state için skip).
@@ -34,7 +34,7 @@ Flutter 3.5+ / Dart, **Riverpod 3 + repository pattern** üzerine kurulu feature
   - `<feature>_view.dart` — `ConsumerWidget` / `ConsumerStatefulWidget`.
   - Numerology istisna: `numerology_calculator.dart` (saf hesap class, provider değil).
 - `enums/`, `generated/assets.dart` — değişmedi.
-- `test/` — `helpers/provider_container_helper.dart`, `helpers/fakes/` (4 fake repository/navigator/ui_helper), feature/core test örnekleri.
+- `test/` — `helpers/provider_container_helper.dart`, `helpers/fakes/` (5 fake: user/fortune/settings repository + navigator + ui_helper), feature/core test örnekleri.
 
 ### State management — Riverpod 3 + codegen
 
@@ -98,7 +98,7 @@ Settings → Çıkış Yap → `authRepository.signOut()` → bootstrap yeni ano
 
 ### GPT / Firebase
 
-`GptService` `dio` ile çağrı yapar; `apiKey`/`model` `Env.*`'tan provider seviyesinde inject edilir. Firebase tarafı şu an **repository pattern arkasındaki mock**'larla çalışıyor — gerçek `cloud_firestore`/`firebase_auth` wire'lı değil. Gerçek Firebase'e geçerken sadece `core/data/*_repository.dart` Mock impl'leri yerine `FirestoreUserRepository` vb. yazıp provider'ları override etmek yeterli.
+`GptService` `dio` ile çağrı yapar; `apiKey`/`model` `Env.*`'tan provider seviyesinde inject edilir. Firebase tarafı **gerçek wire'lı**: `authRepositoryProvider` → `FirebaseAuthRepository`, `userRepositoryProvider` → `FirestoreUserRepository`, `fortuneRepositoryProvider` → `FirestoreFortuneRepository` (`firebase_auth` + `cloud_firestore`). Testte bu provider'lar `core/data/`'daki abstract interface'lerin fake'leriyle override edilir. Not: Firestore koleksiyon adları (`users`, `fortunes`) repository içinde sabit kodlu — ileride `Env.*`'a taşınabilir.
 
 ## Stil notları (yerel)
 

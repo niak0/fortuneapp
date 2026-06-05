@@ -1,0 +1,171 @@
+/* =====================================================================
+   base.css — Reset, sahne (telefon çerçevesi), atmosfer katmanları
+   ===================================================================== */
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Sahne: koyu ortam, telefonu ortalar */
+body {
+  min-height: 100vh;
+  font-family: var(--font-body);
+  color: var(--ink);
+  background:
+    radial-gradient(1200px 800px at 50% -10%, #241019 0%, transparent 60%),
+    radial-gradient(900px 700px at 50% 120%, #1a0c14 0%, transparent 55%),
+    #08050a;
+  display: grid;
+  place-items: center;
+  padding: 40px 16px;
+  overflow-x: hidden;
+}
+
+/* --- Telefon çerçevesi --- */
+.phone {
+  position: relative;
+  width: var(--frame-w);
+  height: var(--frame-h);
+  max-height: calc(100vh - 56px);
+  border-radius: 54px;
+  padding: 12px;
+  background: linear-gradient(160deg, #2a2230, #0d0a10);
+  box-shadow:
+    0 0 0 2px rgba(216, 180, 106, 0.08),
+    0 40px 120px -30px rgba(0, 0, 0, 0.9),
+    0 0 90px -20px var(--halo);
+}
+
+.phone__screen {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 44px;
+  overflow: hidden;
+  background:
+    radial-gradient(130% 90% at 50% -20%, var(--bg-glow) 0%, transparent 55%),
+    radial-gradient(120% 70% at 50% 118%, var(--bg-elev) 0%, transparent 50%),
+    var(--bg);
+  transition: background 0.6s var(--ease-soft);
+  isolation: isolate;
+}
+
+/* Çentik */
+.phone__notch {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 28px;
+  background: #08050a;
+  border-radius: var(--r-pill);
+  z-index: 60;
+}
+
+/* --- Atmosfer: grain + yıldız alanı --- */
+.grain {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.5;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.stars {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.star {
+  position: absolute;
+  background: var(--star);
+  border-radius: 50%;
+  opacity: 0;
+  box-shadow: 0 0 6px var(--star);
+  animation: twinkle var(--dur, 4s) var(--ease-soft) infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0; transform: scale(0.6); }
+  50%      { opacity: var(--peak, 0.9); transform: scale(1); }
+}
+
+/* Alttan yükselen mum parıltısı */
+.screen-glow {
+  position: absolute;
+  left: 50%;
+  bottom: -40px;
+  width: 320px;
+  height: 320px;
+  transform: translateX(-50%);
+  background: radial-gradient(circle, var(--halo) 0%, transparent 65%);
+  filter: blur(8px);
+  z-index: 1;
+  pointer-events: none;
+  animation: breathe 7s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%, 100% { opacity: 0.55; transform: translateX(-50%) scale(1); }
+  50%      { opacity: 0.9;  transform: translateX(-50%) scale(1.12); }
+}
+
+/* --- Uygulama içi kaydırma alanı --- */
+.app {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.app__scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 52px var(--s-5) 110px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
+}
+
+.app__scroll::-webkit-scrollbar { width: 4px; }
+.app__scroll::-webkit-scrollbar-thumb {
+  background: var(--line-strong);
+  border-radius: var(--r-pill);
+}
+
+/* İçeri giriş animasyonu — kademeli */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(14px);
+  animation: rise 0.7s var(--ease) forwards;
+  animation-delay: var(--rd, 0s);
+}
+
+@keyframes rise {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Erişilebilirlik: hareketi azalt */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

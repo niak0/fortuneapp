@@ -92,5 +92,4 @@ class Assets {
   static const String tarotW12 = 'assets/tarot/w12.jpg';
   static const String tarotW13 = 'assets/tarot/w13.jpg';
   static const String tarotW14 = 'assets/tarot/w14.jpg';
-
 }

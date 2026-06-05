@@ -17,10 +17,8 @@ class GoldOptionDialog extends StatelessWidget {
   }) {
     return showDialog(
       context: context,
-      builder: (context) => GoldOptionDialog(
-        onBuyGold: onBuyGold,
-        onWatchAd: onWatchAd,
-      ),
+      builder: (context) =>
+          GoldOptionDialog(onBuyGold: onBuyGold, onWatchAd: onWatchAd),
     );
   }
 
@@ -28,16 +26,12 @@ class GoldOptionDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: const Text("Yetersiz Altın"),
-      content: const Text("Devam etmek için altın gerekiyor. Altın satın al veya reklam izle."),
+      content: const Text(
+        "Devam etmek için altın gerekiyor. Altın satın al veya reklam izle.",
+      ),
       actions: <Widget>[
-        TextButton(
-          onPressed: onWatchAd,
-          child: const Text("Reklam İzle"),
-        ),
-        TextButton(
-          onPressed: onBuyGold,
-          child: const Text("Altın Satın Al"),
-        ),
+        TextButton(onPressed: onWatchAd, child: const Text("Reklam İzle")),
+        TextButton(onPressed: onBuyGold, child: const Text("Altın Satın Al")),
       ],
     );
   }

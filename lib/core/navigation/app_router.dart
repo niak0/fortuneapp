@@ -17,7 +17,6 @@ import 'package:fortuneapp/features/profile_edit/profile_edit_view.dart';
 import 'package:fortuneapp/features/read_fortune/read_fortune_view.dart';
 import 'package:fortuneapp/features/settings/settings_view.dart';
 import 'package:fortuneapp/features/splash/splash_view.dart';
-import 'package:fortuneapp/features/user_setup/user_setup_view.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -32,7 +31,6 @@ enum AppRoutes {
   home,
   fortunes,
   profile,
-  userSetupView,
   profileEdit,
   settings,
   buyCredits,
@@ -65,7 +63,7 @@ GoRouter goRouter(Ref ref) {
   final refresh = _BootstrapRefreshListenable();
   ref.listen<AsyncValue<dynamic>>(
     authBootstrapProvider,
-    (_, __) => refresh.refresh(),
+    (_, _) => refresh.refresh(),
     fireImmediately: true,
   );
   ref.onDispose(refresh.dispose);
@@ -84,47 +82,41 @@ GoRouter goRouter(Ref ref) {
     routes: [
       GoRoute(
         path: AppRoutes.splash.path,
-        builder: (_, __) => const SplashView(),
+        builder: (_, _) => const SplashView(),
       ),
       GoRoute(
         path: AppRoutes.home.path,
-        builder: (_, __) => const ProjectNavigationBar(),
+        builder: (_, _) => const ProjectNavigationBar(),
       ),
       GoRoute(
         path: AppRoutes.fortunes.path,
-        builder: (_, __) => const MyFortunesView(),
+        builder: (_, _) => const MyFortunesView(),
       ),
       GoRoute(
         path: AppRoutes.profile.path,
-        builder: (_, __) => const ProfileView(),
-      ),
-      GoRoute(
-        path: AppRoutes.userSetupView.path,
-        builder: (_, __) => const UserSetupView(),
+        builder: (_, _) => const ProfileView(),
       ),
       GoRoute(
         path: AppRoutes.profileEdit.path,
-        pageBuilder: (_, __) => const MaterialPage(
+        pageBuilder: (_, _) => const MaterialPage(
           fullscreenDialog: true,
           child: ProfileEditView(),
         ),
       ),
       GoRoute(
         path: AppRoutes.settings.path,
-        builder: (_, __) => const SettingsView(),
+        builder: (_, _) => const SettingsView(),
       ),
       GoRoute(
         path: AppRoutes.buyCredits.path,
-        pageBuilder: (_, __) => const MaterialPage(
-          fullscreenDialog: true,
-          child: BuyGoldView(),
-        ),
+        pageBuilder: (_, _) =>
+            const MaterialPage(fullscreenDialog: true, child: BuyGoldView()),
       ),
       GoRoute(
         path: AppRoutes.readFortune.path,
         pageBuilder: (context, state) {
           final args = state.extra as Map<String, dynamic>?;
-          final content = args?['currentContent'] as ContentModel?;
+          final content = args?['currentContent'] as FortuneModel?;
           if (content == null) {
             return const MaterialPage(
               child: Scaffold(body: Center(child: Text('Geçersiz argüman'))),
@@ -138,31 +130,31 @@ GoRouter goRouter(Ref ref) {
       ),
       GoRoute(
         path: AppRoutes.fortuneTarot.path,
-        builder: (_, __) => const FortuneTarotView(),
+        builder: (_, _) => const FortuneTarotView(),
       ),
       GoRoute(
         path: AppRoutes.fortuneHand.path,
-        builder: (_, __) => const FortuneHandView(),
+        builder: (_, _) => const FortuneHandView(),
       ),
       GoRoute(
         path: AppRoutes.fortuneCoffee.path,
-        builder: (_, __) => const FortuneCoffeeView(),
+        builder: (_, _) => const FortuneCoffeeView(),
       ),
       GoRoute(
         path: AppRoutes.fortuneDream.path,
-        builder: (_, __) => const FortuneDreamView(),
+        builder: (_, _) => const FortuneDreamView(),
       ),
       GoRoute(
         path: AppRoutes.biorhythm.path,
-        builder: (_, __) => const BiorhythmView(),
+        builder: (_, _) => const BiorhythmView(),
       ),
       GoRoute(
         path: AppRoutes.astrology.path,
-        builder: (_, __) => const AstrologyView(),
+        builder: (_, _) => const AstrologyView(),
       ),
       GoRoute(
         path: AppRoutes.numerology.path,
-        builder: (_, __) => const NumerologyView(),
+        builder: (_, _) => const NumerologyView(),
       ),
       GoRoute(
         path: AppRoutes.numerologyDetail.path,
@@ -173,7 +165,8 @@ GoRouter goRouter(Ref ref) {
               args?['values'] as Map<NumerologyItem, int>? ?? const {};
           if (selectedItem == null) {
             return const Scaffold(
-                body: Center(child: Text('Geçersiz argüman')));
+              body: Center(child: Text('Geçersiz argüman')),
+            );
           }
           return NumerologyDetailView(
             selectedItem: selectedItem,

@@ -6,18 +6,44 @@ import 'package:fortuneapp/core/widgets/loading_dialog.dart';
 import '../../core/navigation/app_navigator.dart';
 import '../../core/widgets/snackbar.dart';
 import '../../generated/assets.dart';
+import 'fortune_dream_providers.dart';
 
-class FortuneDreamView extends ConsumerWidget {
+// Kullanıcının rüyasını yazıp yorumlatabildiği ekran.
+class FortuneDreamView extends ConsumerStatefulWidget {
   const FortuneDreamView({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    TextEditingController controller = TextEditingController();
+  ConsumerState<FortuneDreamView> createState() => _FortuneDreamViewState();
+}
 
+// Rüya metni controller'ının ömrünü yöneten state.
+class _FortuneDreamViewState extends ConsumerState<FortuneDreamView> {
+  final _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  // Rüya metnini yorumlatma akışını başlatır.
+  Future<void> _interpret() async {
+    final notifier = ref.read(fortuneDreamViewModelProvider.notifier);
+    if (!ref.read(fortuneDreamViewModelProvider).isValid) {
+      CustomSnackBar.show('Lütfen rüyanızı yazınız');
+      return;
+    }
+    LoadingDialog.show(context);
+    final ok = await notifier.submit();
+    if (!mounted) return;
+    LoadingDialog.hide(context);
+    if (ok) ref.read(appNavigatorProvider).pop();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Rüya Tabiri"),
-      ),
+      appBar: AppBar(title: const Text('Rüya Tabiri')),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -26,43 +52,32 @@ class FortuneDreamView extends ConsumerWidget {
               SizedBox(
                 height: 250,
                 width: 300,
-                child: Image.asset(
-                  Assets.iconImageDream,
-                  fit: BoxFit.fill,
-                ),
+                child: Image.asset(Assets.iconImageDream, fit: BoxFit.fill),
               ),
               const SizedBox(height: 20),
-              Text("Gördüğün rüyanın sana ne anlatmak istediğini merak ediyor musun?",
-                  style: Theme.of(context).textTheme.titleLarge, textAlign: TextAlign.center),
+              Text(
+                'Gördüğün rüyanın sana ne anlatmak istediğini merak ediyor musun?',
+                style: Theme.of(context).textTheme.titleLarge,
+                textAlign: TextAlign.center,
+              ),
               const SizedBox(height: 20),
               TextField(
-                controller: controller,
+                controller: _controller,
                 autofocus: false,
                 maxLines: 10,
+                onChanged: (value) => ref
+                    .read(fortuneDreamViewModelProvider.notifier)
+                    .setDreamText(value),
                 decoration: const InputDecoration(
-                  hintText: "Gördüğünüz rüyayı tüm ayrıntılarıyla birlikte gördüklerinizi, hissettiklerinizi ve gördüklerinizin fiziksel "
-                      "özelliklerini açıklayınız",
+                  hintText:
+                      'Gördüğünüz rüyayı tüm ayrıntılarıyla birlikte gördüklerinizi, '
+                      'hissettiklerinizi ve gördüklerinizin fiziksel '
+                      'özelliklerini açıklayınız',
                   border: OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 20),
-              CustomButton(
-                  text: "Rüyayı Yorumla",
-                  onPressed: () async {
-                    if (controller.text.isNotEmpty) {
-                      String message = "Türkçe olarak bu rüyayı yorumla : ${controller.text}";
-                      LoadingDialog.show(context);
-
-                      if (context.mounted) {
-                        LoadingDialog.hide(context);
-                      }
-                      ref.read(appNavigatorProvider).pop();
-                    } else {
-                      if (context.mounted) {
-                        CustomSnackBar.show("Lütfen tüm görüntüleri ve açıklamaları giriniz");
-                      }
-                    }
-                  })
+              CustomButton(text: 'Rüyayı Yorumla', onPressed: _interpret),
             ],
           ),
         ),

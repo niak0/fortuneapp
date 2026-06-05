@@ -13,19 +13,18 @@ class FortuneTarotState {
   });
 
   factory FortuneTarotState.initial() => const FortuneTarotState(
-        cards: null,
-        selectedCards: {'Geçmiş': null, 'Şimdi': null, 'Gelecek': null},
-        angle: 0.0,
-      );
+    cards: null,
+    selectedCards: {'Geçmiş': null, 'Şimdi': null, 'Gelecek': null},
+    angle: 0.0,
+  );
 
   FortuneTarotState copyWith({
     List<CardModel>? cards,
     Map<String, int?>? selectedCards,
     double? angle,
-  }) =>
-      FortuneTarotState(
-        cards: cards ?? this.cards,
-        selectedCards: selectedCards ?? this.selectedCards,
-        angle: angle ?? this.angle,
-      );
+  }) => FortuneTarotState(
+    cards: cards ?? this.cards,
+    selectedCards: selectedCards ?? this.selectedCards,
+    angle: angle ?? this.angle,
+  );
 }

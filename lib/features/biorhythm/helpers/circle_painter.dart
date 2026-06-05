@@ -5,14 +5,15 @@ import 'package:flutter/material.dart';
 class CirclePainter extends CustomPainter {
   final double percentage;
   final Color progressColor;
+  final Color baseColor;
 
-  CirclePainter(this.percentage, this.progressColor);
+  CirclePainter(this.percentage, this.progressColor, this.baseColor);
 
   @override
   void paint(Canvas canvas, Size size) {
     double strokeWidth = 10;
     Paint baseCircle = Paint()
-      ..color = Colors.grey[800]!
+      ..color = baseColor
       ..style = PaintingStyle.stroke
       ..strokeWidth = strokeWidth;
 
@@ -30,7 +31,13 @@ class CirclePainter extends CustomPainter {
 
     // Draw progress arc
     double arcAngle = 2 * pi * percentage;
-    canvas.drawArc(Rect.fromCircle(center: center, radius: radius), -pi / 2, arcAngle, false, progressCircle);
+    canvas.drawArc(
+      Rect.fromCircle(center: center, radius: radius),
+      -pi / 2,
+      arcAngle,
+      false,
+      progressCircle,
+    );
   }
 
   @override

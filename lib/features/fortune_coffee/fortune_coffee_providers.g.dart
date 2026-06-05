@@ -42,7 +42,7 @@ final class FortuneCoffeeViewModelProvider
 }
 
 String _$fortuneCoffeeViewModelHash() =>
-    r'6ac270480bb131586a9dc9a4ccb105b8c03619c6';
+    r'1cba01d72acffa566401c03e4a02780ef57a15d3';
 
 abstract class _$FortuneCoffeeViewModel extends $Notifier<FortuneCoffeeState> {
   FortuneCoffeeState build();

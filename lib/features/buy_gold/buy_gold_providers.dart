@@ -21,7 +21,7 @@ class BuyGoldViewModel extends _$BuyGoldViewModel {
     try {
       const coinAmount = 0;
       if (coinAmount > 0) {
-        ref.read(goldManagerProvider).increaseGold(amount: coinAmount);
+        await ref.read(goldManagerProvider).increaseGold(amount: coinAmount);
       }
       return true;
     } catch (e) {

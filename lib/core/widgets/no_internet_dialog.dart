@@ -5,7 +5,7 @@ class NoInternetDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return  Dialog(
+    return Dialog(
       backgroundColor: Colors.transparent,
       child: AlertDialog(
         title: Text("Bağlantı Yok"),

@@ -32,6 +32,9 @@ class _ShimmerState extends State<Shimmer> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     if (!widget.isLoading) return widget.child;
 
+    final scheme = Theme.of(context).colorScheme;
+    final base = scheme.surfaceContainerHighest;
+    final highlight = scheme.onSurfaceVariant;
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, _) {
@@ -39,12 +42,17 @@ class _ShimmerState extends State<Shimmer> with SingleTickerProviderStateMixin {
           shaderCallback: (bounds) {
             final shimmerPosition = _controller.value * bounds.width;
             return LinearGradient(
-              colors: [Colors.grey.shade100, Colors.grey.shade500, Colors.grey.shade100],
+              colors: [base, highlight, base],
               stops: const [0.2, 0.5, 0.8],
               begin: Alignment(-1.0, -0.3),
               end: Alignment(1.0, 0.3),
             ).createShader(
-              Rect.fromLTWH(shimmerPosition - bounds.width, 0, bounds.width * 1.5, bounds.height),
+              Rect.fromLTWH(
+                shimmerPosition - bounds.width,
+                0,
+                bounds.width * 1.5,
+                bounds.height,
+              ),
             );
           },
           blendMode: BlendMode.srcATop,

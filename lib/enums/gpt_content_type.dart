@@ -8,9 +8,8 @@ enum ContentType {
 
   final IconData icon;
   const ContentType(this.icon);
-
-
 }
+
 extension GptContentTypeExtension on ContentType {
   String get systemMessageContent {
     switch (this) {
@@ -26,6 +25,7 @@ extension GptContentTypeExtension on ContentType {
             "dreams. For this session, you are to provide a dream interpretation as if you were a mysterious and wise dream reader, one who unveils hidden insights and profound messages from the subconscious mind. All dream details will be provided in English, but your response should be entirely in Turkish. Approach the interpretation with a poetic and evocative tone, creating a sense of mystery and depth. Interpret the dream by revealing symbolic messages, addressing possible emotions, desires, and warnings, while leaving room for personal reflection. Your response should offer guidance that feels timeless and profound, as if each word holds a deeper, hidden meaning.";
     }
   }
+
   String get displayName {
     switch (this) {
       case ContentType.coffee:

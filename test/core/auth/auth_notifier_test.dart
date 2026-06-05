@@ -12,9 +12,9 @@ void main() {
       final fake = FakeAuthRepository(
         initial: const AuthUser(uid: 'anon-1', isAnonymous: true),
       );
-      final container = makeContainer(overrides: [
-        authRepositoryProvider.overrideWithValue(fake),
-      ]);
+      final container = makeContainer(
+        overrides: [authRepositoryProvider.overrideWithValue(fake)],
+      );
 
       expect(container.read(authProvider)?.isAnonymous, true);
 
@@ -28,9 +28,9 @@ void main() {
       final fake = FakeAuthRepository(
         initial: const AuthUser(uid: 'u1', isAnonymous: false),
       );
-      final container = makeContainer(overrides: [
-        authRepositoryProvider.overrideWithValue(fake),
-      ]);
+      final container = makeContainer(
+        overrides: [authRepositoryProvider.overrideWithValue(fake)],
+      );
 
       expect(container.read(authProvider), isNotNull);
 

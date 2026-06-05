@@ -23,7 +23,7 @@ class ProfileEditViewModel extends _$ProfileEditViewModel {
     String? zodiacSign,
     String? gender,
     String? workState,
-    String? relationShipState,
+    String? relationshipState,
   }) {
     final current = state;
     if (current == null) return;
@@ -34,7 +34,7 @@ class ProfileEditViewModel extends _$ProfileEditViewModel {
       zodiacSign: zodiacSign,
       gender: gender,
       workState: workState,
-      relationShipState: relationShipState,
+      relationshipState: relationshipState,
     );
   }
 

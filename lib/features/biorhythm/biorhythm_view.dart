@@ -8,6 +8,7 @@ import 'package:fortuneapp/features/biorhythm/helpers/circle_painter.dart';
 import 'package:fortuneapp/features/biorhythm/helpers/day_items.dart';
 
 import '../../core/auth/current_user.dart';
+import '../../core/theme/mystic_tokens.dart';
 
 // Kullanıcının biyoritim grafiği ve yorumlarını gösteren ekran.
 class BiorhythmView extends ConsumerWidget {
@@ -24,10 +25,12 @@ class BiorhythmView extends ConsumerWidget {
         if (user == null) {
           return const Scaffold(body: Center(child: Text('Kullanıcı yok')));
         }
-        final vmProvider =
-            biorhythmViewModelProvider(birthDate: user.birthDate);
+        final vmProvider = biorhythmViewModelProvider(
+          birthDate: user.birthDate,
+        );
         final selectedDay = ref.watch(vmProvider);
         final vm = ref.read(vmProvider.notifier);
+        final tokens = MysticTokens.of(context);
 
         return Scaffold(
           appBar: AppBar(
@@ -52,8 +55,12 @@ class BiorhythmView extends ConsumerWidget {
                   children: [
                     SegmentedButton<DayItems>(
                       segments: DayItems.values
-                          .map((item) => ButtonSegment(
-                              value: item, label: Text(item.displayName)))
+                          .map(
+                            (item) => ButtonSegment(
+                              value: item,
+                              label: Text(item.displayName),
+                            ),
+                          )
                           .toList(),
                       showSelectedIcon: false,
                       selected: {selectedDay},
@@ -64,14 +71,16 @@ class BiorhythmView extends ConsumerWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: BiorhythmItems.values
-                            .map((item) => buildBiorhythmIndicator(
-                                  context,
-                                  item.name,
-                                  item.color,
-                                  item.icon,
-                                  vm.decimal(item.cycle),
-                                  vm.percentage(item.cycle),
-                                ))
+                            .map(
+                              (item) => buildBiorhythmIndicator(
+                                context,
+                                item.name,
+                                item.color(tokens),
+                                item.icon,
+                                vm.decimal(item.cycle),
+                                vm.percentage(item.cycle),
+                              ),
+                            )
                             .toList(),
                       ),
                     ),
@@ -85,7 +94,7 @@ class BiorhythmView extends ConsumerWidget {
                           name: item.name,
                           comment: item.getComment(percentage),
                           icon: item.icon,
-                          color: item.color,
+                          color: item.color(tokens),
                           percentage: percentage,
                         );
                       }).toList(),
@@ -116,14 +125,12 @@ class BiorhythmView extends ConsumerWidget {
         children: [
           ListTile(
             leading: Icon(icon, color: color),
-            title: Text(name,
-                style: Theme.of(context).textTheme.headlineSmall),
+            title: Text(name, style: Theme.of(context).textTheme.headlineSmall),
             trailing: Text(
               '$percentage/100',
-              style: Theme.of(context)
-                  .textTheme
-                  .titleMedium
-                  ?.copyWith(color: color),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(color: color),
             ),
           ),
           Padding(
@@ -131,7 +138,8 @@ class BiorhythmView extends ConsumerWidget {
             child: Text(
               comment,
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant),
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
             ),
           ),
         ],
@@ -161,7 +169,11 @@ class BiorhythmView extends ConsumerWidget {
               duration: duration,
               builder: (context, animatedPercent, child) {
                 return CustomPaint(
-                  painter: CirclePainter(animatedPercent, color),
+                  painter: CirclePainter(
+                    animatedPercent,
+                    color,
+                    Theme.of(context).colorScheme.surfaceContainerHighest,
+                  ),
                   child: Center(
                     child: TweenAnimationBuilder<int>(
                       tween: IntTween(begin: 0, end: decimal),
@@ -173,10 +185,9 @@ class BiorhythmView extends ConsumerWidget {
                             Icon(icon, size: 30.0, color: color),
                             Text(
                               '$animatedValue%',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleLarge
-                                  ?.copyWith(color: color),
+                              style: Theme.of(
+                                context,
+                              ).textTheme.titleLarge?.copyWith(color: color),
                             ),
                           ],
                         );
@@ -189,10 +200,9 @@ class BiorhythmView extends ConsumerWidget {
           ),
           Text(
             label,
-            style: Theme.of(context)
-                .textTheme
-                .titleLarge
-                ?.copyWith(color: color),
+            style: Theme.of(
+              context,
+            ).textTheme.titleLarge?.copyWith(color: color),
           ),
         ],
       ),

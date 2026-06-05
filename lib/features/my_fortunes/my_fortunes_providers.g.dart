@@ -13,7 +13,7 @@ part of 'my_fortunes_providers.dart';
 final myFortunesViewModelProvider = MyFortunesViewModelProvider._();
 
 final class MyFortunesViewModelProvider
-    extends $StreamNotifierProvider<MyFortunesViewModel, List<ContentModel>> {
+    extends $StreamNotifierProvider<MyFortunesViewModel, List<FortuneModel>> {
   MyFortunesViewModelProvider._()
     : super(
         from: null,
@@ -34,21 +34,21 @@ final class MyFortunesViewModelProvider
 }
 
 String _$myFortunesViewModelHash() =>
-    r'4400ad7cd266e7e8c68242b5d0b73dd7f297cb1f';
+    r'4ba41579ab1db07e10576b8206b45d84790c88c0';
 
 abstract class _$MyFortunesViewModel
-    extends $StreamNotifier<List<ContentModel>> {
-  Stream<List<ContentModel>> build();
+    extends $StreamNotifier<List<FortuneModel>> {
+  Stream<List<FortuneModel>> build();
   @$mustCallSuper
   @override
   void runBuild() {
     final ref =
-        this.ref as $Ref<AsyncValue<List<ContentModel>>, List<ContentModel>>;
+        this.ref as $Ref<AsyncValue<List<FortuneModel>>, List<FortuneModel>>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<AsyncValue<List<ContentModel>>, List<ContentModel>>,
-              AsyncValue<List<ContentModel>>,
+              AnyNotifier<AsyncValue<List<FortuneModel>>, List<FortuneModel>>,
+              AsyncValue<List<FortuneModel>>,
               Object?,
               Object?
             >;

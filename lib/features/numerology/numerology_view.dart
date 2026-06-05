@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fortuneapp/core/navigation/app_navigator.dart';
@@ -7,6 +6,7 @@ import 'package:fortuneapp/features/numerology/numerology_calculator.dart';
 
 import '../../core/auth/current_user.dart';
 import '../../core/models/user_model.dart';
+import '../../core/theme/mystic_tokens.dart';
 
 // Kullanıcının numeroloji değerlerini gösteren ekran.
 class NumerologyView extends ConsumerWidget {
@@ -16,13 +16,14 @@ class NumerologyView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final currentUserAsync = ref.watch(currentUserProvider);
     return currentUserAsync.when(
-      loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),
+      loading: () =>
+          const Scaffold(body: Center(child: CircularProgressIndicator())),
       error: (e, _) => Scaffold(body: Center(child: Text('Hata: $e'))),
       data: (user) {
         if (user == null) {
           return const Scaffold(body: Center(child: Text('Kullanıcı yok')));
         }
-        final viewModel = NumerologyCalculator(user.name, DateTime(1999, 01, 11))
+        final viewModel = NumerologyCalculator(user.name, user.birthDate)
           ..calculate();
         return Scaffold(
           appBar: AppBar(title: const Text('Numeroloji')),
@@ -36,13 +37,25 @@ class NumerologyView extends ConsumerWidget {
                   color: Theme.of(context).colorScheme.primary,
                   child: const ListTile(
                     dense: true,
-                    title: Text('Detaylı yorum için bir ögeyi veya kategoriyi seçin.'),
+                    title: Text(
+                      'Detaylı yorum için bir ögeyi veya kategoriyi seçin.',
+                    ),
                     trailing: Icon(Icons.info_outlined),
                   ),
                 ),
-                _buildCategoryCard(context, ref, BirthDateCalculations.values, viewModel),
+                _buildCategoryCard(
+                  context,
+                  ref,
+                  BirthDateCalculations.values,
+                  viewModel,
+                ),
                 const SizedBox(height: 20),
-                _buildCategoryCard(context, ref, NameCalculations.values, viewModel),
+                _buildCategoryCard(
+                  context,
+                  ref,
+                  NameCalculations.values,
+                  viewModel,
+                ),
                 const SizedBox(height: 20),
                 _buildCategoryCard(context, ref, TimeCycles.values, viewModel),
                 const SizedBox(height: 20),
@@ -76,7 +89,7 @@ class NumerologyView extends ConsumerWidget {
   ) {
     final theme = Theme.of(context);
     final title = items.first.title;
-    final color = items.first.color;
+    final color = items.first.color(MysticTokens.of(context));
     final icon = items.first.icon;
 
     final Map<NumerologyItem, int> values = {};
@@ -87,11 +100,12 @@ class NumerologyView extends ConsumerWidget {
         Card(
           color: color,
           child: ListTile(
-            onTap: () => ref.read(appNavigatorProvider)
-                .pushToPage(AppRoutes.numerologyDetail, arguments: {
-              'selectedItem': items.first,
-              'values': values,
-            }),
+            onTap: () => ref
+                .read(appNavigatorProvider)
+                .pushToPage(
+                  AppRoutes.numerologyDetail,
+                  arguments: {'selectedItem': items.first, 'values': values},
+                ),
             dense: true,
             title: Text(title, style: theme.textTheme.titleSmall),
             trailing: const Icon(Icons.chevron_right_outlined),
@@ -108,12 +122,20 @@ class NumerologyView extends ConsumerWidget {
                 ),
                 margin: const EdgeInsets.all(4),
                 child: InkWell(
-                  onTap: () => ref.read(appNavigatorProvider)
-                      .pushToPage(AppRoutes.numerologyDetail, arguments: {
-                    'selectedItem': items.first,
-                    'values': values,
-                  }),
-                  child: Icon(icon, size: 120, color: Colors.white),
+                  onTap: () => ref
+                      .read(appNavigatorProvider)
+                      .pushToPage(
+                        AppRoutes.numerologyDetail,
+                        arguments: {
+                          'selectedItem': items.first,
+                          'values': values,
+                        },
+                      ),
+                  child: Icon(
+                    icon,
+                    size: 120,
+                    color: Theme.of(context).colorScheme.onPrimary,
+                  ),
                 ),
               ),
               Expanded(
@@ -129,19 +151,17 @@ class NumerologyView extends ConsumerWidget {
                         title: Text(item.displayName),
                         trailing: Text(value.toString()),
                         onTap: () {
-                          if (kDebugMode) {
-                            print('${item.displayName} = $value');
-                            print('$values');
-                          }
-                          ref.read(appNavigatorProvider).pushToPage(
-                            AppRoutes.numerologyDetail,
-                            arguments: {
-                              'selectedItem': item,
-                              'categoryItems': items,
-                              'value': value,
-                              'values': values,
-                            },
-                          );
+                          ref
+                              .read(appNavigatorProvider)
+                              .pushToPage(
+                                AppRoutes.numerologyDetail,
+                                arguments: {
+                                  'selectedItem': item,
+                                  'categoryItems': items,
+                                  'value': value,
+                                  'values': values,
+                                },
+                              );
                         },
                       ),
                     );

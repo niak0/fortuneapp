@@ -5,18 +5,6 @@ enum ZodiacElements {
   love,
   money;
 
-  Color get color {
-    switch (this) {
-      case health:
-        return Colors.blue;
-      case love:
-        return Colors.red;
-      case money:
-        return Colors.green;
-      default:
-        return Colors.grey;
-    }
-  }
   String get displayName {
     switch (this) {
       case ZodiacElements.health:
@@ -25,10 +13,9 @@ enum ZodiacElements {
         return "Aşk";
       case ZodiacElements.money:
         return "Para";
-      default:
-        return "";
     }
   }
+
   IconData get icon {
     switch (this) {
       case ZodiacElements.health:
@@ -37,8 +24,6 @@ enum ZodiacElements {
         return Icons.favorite_outlined;
       case ZodiacElements.money:
         return Icons.attach_money_outlined;
-      default:
-        return Icons.shopping_bag_outlined;
     }
   }
 }

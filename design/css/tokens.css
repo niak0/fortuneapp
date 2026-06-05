@@ -1,0 +1,155 @@
+/* =====================================================================
+   tokens.css — Tasarım jetonları (Design tokens)
+   ---------------------------------------------------------------------
+   Tüm renkler tema bloklarına ayrıldı. Yeni bir tema eklemek için
+   yeni bir [data-theme="x"] bloğu kopyalaman yeterli — başka hiçbir
+   dosyaya dokunmana gerek yok. Bileşenler yalnızca bu değişkenleri
+   kullanır, sabit renk yazmaz.
+   ===================================================================== */
+
+:root {
+  /* --- Tüm temalarda ortak: tipografi --- */
+  --font-display: "Cinzel", serif;          /* kazınmış altın başlıklar */
+  --font-serif: "Cormorant Garamond", serif; /* zarif italik fısıltılar */
+  --font-body: "Jost", system-ui, sans-serif;
+
+  /* --- Boşluk ölçeği --- */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 24px;
+  --s-6: 32px;
+  --s-7: 48px;
+
+  /* --- Köşe yarıçapları --- */
+  --r-sm: 12px;
+  --r-md: 18px;
+  --r-lg: 26px;
+  --r-pill: 999px;
+
+  /* --- Hareket --- */
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-soft: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* --- Telefon çerçevesi --- */
+  --frame-w: 392px;
+  --frame-h: 844px;
+}
+
+/* =====================================================================
+   TEMA 1 — Mum Işığı (varsayılan)  ·  sıcak altın · eflatun · amber
+   Sabit görsellerle birebir uyumlu ana tema.
+   ===================================================================== */
+[data-theme="candlelight"] {
+  --bg-deep:   #120810;
+  --bg:        #1d0e18;
+  --bg-elev:   #2a1622;
+  --bg-elev-2: #341c2a;
+  --bg-glow:   #4a2335;
+
+  --gold:        #d8b46a;
+  --gold-bright: #f4d896;
+  --gold-deep:   #9c7838;
+  --flame:       #ea8e4c;
+
+  --ink:       #f7ecdd;
+  --ink-soft:  #d3b9a9;
+  --ink-faint: #97796b;
+
+  --line:        rgba(216, 180, 106, 0.22);
+  --line-strong: rgba(216, 180, 106, 0.45);
+  --halo:        rgba(234, 142, 76, 0.40);
+  --star:        #f4d896;
+
+  --grad-hero: linear-gradient(155deg, #4a2335 0%, #1d0e18 75%);
+  --accent:    var(--flame);
+  --on-accent: #1a0a06;
+}
+
+/* =====================================================================
+   TEMA 2 — Gece Yarısı  ·  derin lacivert · gümüş-altın yıldızlar
+   ===================================================================== */
+[data-theme="midnight"] {
+  --bg-deep:   #05070f;
+  --bg:        #0a0e1d;
+  --bg-elev:   #121830;
+  --bg-elev-2: #18203f;
+  --bg-glow:   #1e2b55;
+
+  --gold:        #c9b67e;
+  --gold-bright: #efe2ad;
+  --gold-deep:   #7d6f48;
+  --flame:       #6f8dff;
+
+  --ink:       #eaf0ff;
+  --ink-soft:  #aeb9d8;
+  --ink-faint: #6a7596;
+
+  --line:        rgba(138, 166, 255, 0.20);
+  --line-strong: rgba(138, 166, 255, 0.42);
+  --halo:        rgba(111, 141, 255, 0.40);
+  --star:        #cdd9ff;
+
+  --grad-hero: linear-gradient(155deg, #1e2b55 0%, #0a0e1d 75%);
+  --accent:    var(--flame);
+  --on-accent: #050a1a;
+}
+
+/* =====================================================================
+   TEMA 3 — Ametist  ·  mor-mürdüm · bakır · gül kuvars
+   ===================================================================== */
+[data-theme="amethyst"] {
+  --bg-deep:   #0e0814;
+  --bg:        #160d23;
+  --bg-elev:   #211433;
+  --bg-elev-2: #2a1a41;
+  --bg-glow:   #3c2459;
+
+  --gold:        #d8a7c4;
+  --gold-bright: #f3cfe2;
+  --gold-deep:   #9a6f87;
+  --flame:       #c79bff;
+
+  --ink:       #f4ecff;
+  --ink-soft:  #cbb6dd;
+  --ink-faint: #8a749e;
+
+  --line:        rgba(199, 155, 255, 0.22);
+  --line-strong: rgba(199, 155, 255, 0.46);
+  --halo:        rgba(199, 155, 255, 0.42);
+  --star:        #f0d8ff;
+
+  --grad-hero: linear-gradient(155deg, #3c2459 0%, #160d23 75%);
+  --accent:    var(--flame);
+  --on-accent: #160826;
+}
+
+/* =====================================================================
+   TEMA 4 — Obsidyen  ·  is karası · zümrüt-altın (eski yeşil temaya selam)
+   ===================================================================== */
+[data-theme="obsidian"] {
+  --bg-deep:   #060807;
+  --bg:        #0c100e;
+  --bg-elev:   #131a16;
+  --bg-elev-2: #1a241f;
+  --bg-glow:   #18352a;
+
+  --gold:        #cbb878;
+  --gold-bright: #efe1a6;
+  --gold-deep:   #7e7044;
+  --flame:       #5ddcb0;
+
+  --ink:       #eef5f0;
+  --ink-soft:  #aebcb4;
+  --ink-faint: #69776f;
+
+  --line:        rgba(93, 220, 176, 0.18);
+  --line-strong: rgba(93, 220, 176, 0.40);
+  --halo:        rgba(93, 220, 176, 0.36);
+  --star:        #d7f3e8;
+
+  --grad-hero: linear-gradient(155deg, #18352a 0%, #0c100e 75%);
+  --accent:    var(--flame);
+  --on-accent: #04140e;
+}

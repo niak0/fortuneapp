@@ -34,7 +34,7 @@ final class ConnectivityServiceProvider
 }
 
 String _$connectivityServiceHash() =>
-    r'e9da728cb7a8795455cec4ff1c4cb00204817b8a';
+    r'ce4fb593b0d69da54c2d0f02dbb65ff3994b2dd5';
 
 abstract class _$ConnectivityService extends $StreamNotifier<bool> {
   Stream<bool> build();

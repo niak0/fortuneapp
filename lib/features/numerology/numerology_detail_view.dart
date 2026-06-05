@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:fortuneapp/core/theme/mystic_tokens.dart';
 import 'package:fortuneapp/features/numerology/helpers/numerology_items.dart';
 
 class NumerologyDetailView extends StatefulWidget {
   final NumerologyItem? selectedItem;
   final Map<NumerologyItem, int> values;
 
-  const NumerologyDetailView({super.key, this.selectedItem, required this.values});
+  const NumerologyDetailView({
+    super.key,
+    this.selectedItem,
+    required this.values,
+  });
 
   @override
   NumerologyDetailViewState createState() => NumerologyDetailViewState();
@@ -29,27 +34,39 @@ class NumerologyDetailViewState extends State<NumerologyDetailView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(_currentItem.title),
-      ),
+      appBar: AppBar(title: Text(_currentItem.title)),
       body: Padding(
         padding: const EdgeInsets.all(10.0),
         child: Column(
           children: [
             SegmentedButton<NumerologyItem>(
               style: ButtonStyle(
-                shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
-                side: WidgetStateProperty.all(BorderSide(color: Theme.of(context).colorScheme.primary, width: 0)),
-                alignment: Alignment.centerLeft,
-                backgroundColor: WidgetStateProperty.resolveWith<Color?>(
-                  (states) {
-                    if (states.contains(WidgetState.selected)) {
-                      return widget.selectedItem?.color ?? widget.values.keys.first.color;
-                    }
-                    return Colors.transparent; // Diğer segmentlerin arka plan rengi
-                  },
+                shape: WidgetStateProperty.all(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                 ),
-                foregroundColor: WidgetStateProperty.all(Colors.black),
+                side: WidgetStateProperty.all(
+                  BorderSide(
+                    color: Theme.of(context).colorScheme.primary,
+                    width: 0,
+                  ),
+                ),
+                alignment: Alignment.centerLeft,
+                backgroundColor: WidgetStateProperty.resolveWith<Color?>((
+                  states,
+                ) {
+                  if (states.contains(WidgetState.selected)) {
+                    final tokens = MysticTokens.of(context);
+                    return (widget.selectedItem ?? widget.values.keys.first)
+                        .color(tokens);
+                  }
+                  return Colors
+                      .transparent; // Diğer segmentlerin arka plan rengi
+                }),
+                foregroundColor: WidgetStateProperty.all(
+                  Theme.of(context).colorScheme.onSurface,
+                ),
               ),
               showSelectedIcon: false,
               segments: widget.values.keys.map((item) {
@@ -59,11 +76,24 @@ class NumerologyDetailViewState extends State<NumerologyDetailView> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      Text(item.displayName, style: Theme.of(context).textTheme.labelSmall?.copyWith(color: Theme.of(context).colorScheme.tertiary)),
-                      Divider(color: Theme.of(context).colorScheme.tertiary, thickness: 0.5),
+                      Text(
+                        item.displayName,
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: Theme.of(context).colorScheme.tertiary,
+                        ),
+                      ),
+                      Divider(
+                        color: Theme.of(context).colorScheme.tertiary,
+                        thickness: 0.5,
+                      ),
                       Chip(
-                        label: Text("${widget.values[item]}",
-                            style: Theme.of(context).textTheme.labelSmall?.copyWith(color: Theme.of(context).colorScheme.tertiary)),
+                        label: Text(
+                          "${widget.values[item]}",
+                          style: Theme.of(context).textTheme.labelSmall
+                              ?.copyWith(
+                                color: Theme.of(context).colorScheme.tertiary,
+                              ),
+                        ),
                       ),
                     ],
                   ),
@@ -76,7 +106,10 @@ class NumerologyDetailViewState extends State<NumerologyDetailView> {
             ),
             const SizedBox(height: 10),
             Expanded(
-              child: _buildDetailContent(_currentItem, widget.values[_currentItem]!),
+              child: _buildDetailContent(
+                _currentItem,
+                widget.values[_currentItem]!,
+              ),
             ),
           ],
         ),
@@ -93,18 +126,14 @@ class NumerologyDetailViewState extends State<NumerologyDetailView> {
             color: Colors.transparent,
             child: ExpansionTile(
               title: const Text("Bu sayı ne anlama geliyor?"),
-              children: [
-                Text(item.description),
-              ],
+              children: [Text(item.description)],
             ),
           ),
           Card(
             color: Colors.transparent,
             child: ExpansionTile(
               title: const Text("Nasıl hesaplanır?"),
-              children: [
-                Text(item.description),
-              ],
+              children: [Text(item.description)],
             ),
           ),
           Row(
@@ -112,23 +141,23 @@ class NumerologyDetailViewState extends State<NumerologyDetailView> {
             children: [
               Chip(
                 shape: const CircleBorder(),
-                backgroundColor: item.color,
+                backgroundColor: item.color(MysticTokens.of(context)),
                 label: Icon(item.icon),
               ),
               Chip(
-                backgroundColor: item.color,
+                backgroundColor: item.color(MysticTokens.of(context)),
                 label: Text(
                   "Açıklama",
-                  style: Theme.of(context).textTheme.labelLarge?.copyWith(color: Theme.of(context).colorScheme.tertiary),
+                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                    color: Theme.of(context).colorScheme.tertiary,
+                  ),
                 ),
               ),
             ],
           ),
           Text(item.description),
           const SizedBox(height: 16),
-          Text(
-            'Değer: $value',
-          ),
+          Text('Değer: $value'),
           const SizedBox(height: 16),
         ],
       ),

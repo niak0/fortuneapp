@@ -172,6 +172,7 @@ enum AnimalEnum {
       2025: DateTime(2025, 1, 29),
     };
 
-    return chineseNewYearDates[year] ?? DateTime(year, 2, 4); // Varsayılan olarak Şubat başını döndürüyor
+    return chineseNewYearDates[year] ??
+        DateTime(year, 2, 4); // Varsayılan olarak Şubat başını döndürüyor
   }
 }

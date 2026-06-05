@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 enum FortuneTopic {
@@ -10,6 +9,4 @@ enum FortuneTopic {
   final String displayName;
   final IconData icon;
   const FortuneTopic(this.displayName, this.icon);
-
 }
-

@@ -28,17 +28,23 @@ class FortuneTarotView extends ConsumerWidget {
           appBar: AppBar(title: const Text('Tarot')),
           body: Column(
             children: [
-              Text('Kartlarını seç',
-                  style: Theme.of(context).textTheme.headlineSmall),
+              Text(
+                'Kartlarını seç',
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
               const SizedBox(height: 10),
               _buildDrawAreas(state),
               const SizedBox(height: 20),
-              Text('Çarkı sağa-sola çevir',
-                  style: Theme.of(context).textTheme.headlineSmall),
+              Text(
+                'Çarkı sağa-sola çevir',
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
               const SizedBox(height: 10),
               _buildRotatingWheel(size, state, notifier),
-              Text('Seçmek istediğin karta dokun!',
-                  style: Theme.of(context).textTheme.headlineSmall),
+              Text(
+                'Seçmek istediğin karta dokun!',
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
               const SizedBox(height: 50),
               if (state.selectedCards.values.every((c) => c != null))
                 _buildElevatedButton(context, ref, notifier),
@@ -51,14 +57,17 @@ class FortuneTarotView extends ConsumerWidget {
 
   // Tarot devam butonu (yorumlamayı başlatır).
   Widget _buildElevatedButton(
-      BuildContext context, WidgetRef ref, FortuneTarotViewModel notifier) {
+    BuildContext context,
+    WidgetRef ref,
+    FortuneTarotViewModel notifier,
+  ) {
     return ElevatedButton(
       onPressed: () async {
         LoadingDialog.show(context);
-        await notifier.handleSelectedCards();
+        final ok = await notifier.handleSelectedCards();
         if (context.mounted) {
           LoadingDialog.hide(context);
-          ref.read(appNavigatorProvider).pop();
+          if (ok) ref.read(appNavigatorProvider).pop();
         }
       },
       style: ElevatedButton.styleFrom(
@@ -86,22 +95,28 @@ class FortuneTarotView extends ConsumerWidget {
       children: labels.map((drawArea) {
         return Column(
           children: [
-            Container(
-              width: 100,
-              height: 150,
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color:
-                      drawArea == nextEmptyArea ? Colors.brown : Colors.grey,
-                  width: 3,
-                ),
-              ),
-              child: state.selectedCards[drawArea] != null
-                  ? Image.asset(
-                      'assets/tarot/${cards[state.selectedCards[drawArea]!].img}',
-                      fit: BoxFit.fill,
-                    )
-                  : const Icon(Icons.add_rounded, color: Colors.brown),
+            Builder(
+              builder: (context) {
+                final scheme = Theme.of(context).colorScheme;
+                return Container(
+                  width: 100,
+                  height: 150,
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: drawArea == nextEmptyArea
+                          ? scheme.primary
+                          : scheme.outlineVariant,
+                      width: 3,
+                    ),
+                  ),
+                  child: state.selectedCards[drawArea] != null
+                      ? Image.asset(
+                          'assets/tarot/${cards[state.selectedCards[drawArea]!].img}',
+                          fit: BoxFit.fill,
+                        )
+                      : Icon(Icons.add_rounded, color: scheme.primary),
+                );
+              },
             ),
             const SizedBox(height: 10),
             Text(

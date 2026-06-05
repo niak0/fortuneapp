@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fortuneapp/core/auth/auth_notifier.dart';
+import 'package:fortuneapp/core/widgets/snackbar.dart';
 import 'package:fortuneapp/enums/drawer_items.dart';
 
 import '../../core/navigation/app_navigator.dart';
@@ -9,59 +10,57 @@ import '../../core/navigation/app_navigator.dart';
 class SideBar extends ConsumerWidget {
   const SideBar({super.key});
 
-  void _showSignOutDialog(BuildContext context, WidgetRef ref) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text("Çıkış yap"),
-          content: const Text("Çıkış yapmak istediğinize emin misiniz?"),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text("İptal"),
-            ),
-            TextButton(
-              onPressed: () async {
-                Navigator.of(context).pop();
-                await ref.read(authProvider.notifier).signOut();
-                ref.read(appNavigatorProvider).pushAndRemoveUntil(AppRoutes.home);
-              },
-              child: const Text("Çıkış Yap"),
-            ),
-          ],
-        );
-      },
-    );
+  // Drawer'ı kapatır; sonra rota açar (geçiş sırasında çekmece kapanmış olur).
+  void _goTo(BuildContext context, WidgetRef ref, AppRoutes route) {
+    Scaffold.of(context).closeDrawer();
+    ref.read(appNavigatorProvider).pushToPage(route);
   }
 
-  void _showDeleteAccountDialog(BuildContext context) {
-    showDialog(
+  // Drawer'ı kapatır; henüz hazır olmayan özellikler için bilgi verir.
+  void _comingSoon(BuildContext context) {
+    Scaffold.of(context).closeDrawer();
+    CustomSnackBar.show('Yakında');
+  }
+
+  // Oturumu kapatır ve anasayfaya döner (bootstrap yeni anon oturum açar).
+  Future<void> _signOut(WidgetRef ref) async {
+    await ref.read(authProvider.notifier).signOut();
+    ref.read(appNavigatorProvider).pushAndRemoveUntil(AppRoutes.home);
+  }
+
+  // İptal/Onay düğmeli ortak onay diyaloğu (yıkıcı eylemde kırmızı vurgu).
+  Future<void> _confirmDialog(
+    BuildContext context, {
+    required String title,
+    required String content,
+    required String confirmLabel,
+    required Future<void> Function() onConfirm,
+    bool isDestructive = false,
+  }) {
+    return showDialog(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text("Bu işlem geri alınamaz"),
-          content: const Text("Hesabınızı silmek istediğinize emin misiniz?"),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text("İptal"),
-            ),
-            TextButton(
-              onPressed: () async {
-                Navigator.of(context).pop();
-                // await context.read<AuthManager>().deleteUser();
-                // ref.read(appNavigatorProvider).pushAndRemoveUntil(AppRoutes.home);
-              },
-              child: const Text("Hesabı Sil", style: TextStyle(color: Colors.red, fontSize: 14)),
-            ),
-          ],
-        );
-      },
+      builder: (dialogContext) => AlertDialog(
+        title: Text(title),
+        content: Text(content),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text('İptal'),
+          ),
+          TextButton(
+            style: isDestructive
+                ? TextButton.styleFrom(
+                    foregroundColor: Theme.of(context).colorScheme.error,
+                  )
+                : null,
+            onPressed: () async {
+              Navigator.of(dialogContext).pop();
+              await onConfirm();
+            },
+            child: Text(confirmLabel),
+          ),
+        ],
+      ),
     );
   }
 
@@ -70,48 +69,65 @@ class SideBar extends ConsumerWidget {
     return SafeArea(
       child: Drawer(
         width: MediaQuery.of(context).size.width / 1.6,
-        child: ListView(padding: const EdgeInsets.symmetric(vertical: 10), children: [
-          DrawerItems.profile.customListTile(onTap: () {
-            ref.read(appNavigatorProvider).pushToPage(AppRoutes.profileEdit);
-          }),
-          DrawerItems.addGold.customListTile(onTap: () {
-            ref.read(appNavigatorProvider).pushToPage(AppRoutes.buyCredits);
-          }),
-          const Divider(),
-          DrawerItems.feedback.customListTile(onTap: () {
-            ref.read(appNavigatorProvider).pushToPage(AppRoutes.settings);
-          }),
-          DrawerItems.contactUs.customListTile(onTap: () {}),
-          const Divider(),
-          DrawerItems.termsOfService.customListTile(onTap: () {}),
-          DrawerItems.privacyPolicy.customListTile(onTap: () {}),
-          // DrawerItems.settings.customListTile(onTap: () {
-          //   ref.read(appNavigatorProvider).pushToPage(AppRoutes.settings);
-          // }),
-          // Container(
-          //   height: 200,
-          //   color: Theme.of(context).colorScheme.primaryContainer,
-          //   child: googleAds.showBannerAd(),
-          // )
-          const Divider(),
-          SizedBox(height: 30),
-          Card(
+        child: ListView(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          children: [
+            DrawerItems.profile.customListTile(
+              onTap: () => _goTo(context, ref, AppRoutes.profile),
+            ),
+            DrawerItems.addGold.customListTile(
+              onTap: () => _goTo(context, ref, AppRoutes.buyCredits),
+            ),
+            DrawerItems.settings.customListTile(
+              onTap: () => _goTo(context, ref, AppRoutes.settings),
+            ),
+            const Divider(),
+            DrawerItems.feedback.customListTile(
+              onTap: () => _comingSoon(context),
+            ),
+            DrawerItems.contactUs.customListTile(
+              onTap: () => _comingSoon(context),
+            ),
+            const Divider(),
+            DrawerItems.termsOfService.customListTile(
+              onTap: () => _comingSoon(context),
+            ),
+            DrawerItems.privacyPolicy.customListTile(
+              onTap: () => _comingSoon(context),
+            ),
+            const Divider(),
+            const SizedBox(height: 30),
+            Card(
               child: ElevatedButton(
-                  onPressed: () {
-                    if (context.mounted) {
-                      _showSignOutDialog(context, ref);
-                    }
-                  },
-                  child: const Text('Çıkış Yap'))),
-
-          TextButton(
-              onPressed: () {
-                if (context.mounted) {
-                  _showDeleteAccountDialog(context);
-                }
-              },
-              child: const Text("Hesabımı Sil", style: TextStyle(color: Colors.red, fontSize: 16))),
-        ]),
+                onPressed: () => _confirmDialog(
+                  context,
+                  title: 'Çıkış yap',
+                  content: 'Çıkış yapmak istediğinize emin misiniz?',
+                  confirmLabel: 'Çıkış Yap',
+                  onConfirm: () => _signOut(ref),
+                ),
+                child: const Text('Çıkış Yap'),
+              ),
+            ),
+            TextButton(
+              onPressed: () => _confirmDialog(
+                context,
+                title: 'Bu işlem geri alınamaz',
+                content: 'Hesabınızı silmek istediğinize emin misiniz?',
+                confirmLabel: 'Hesabı Sil',
+                isDestructive: true,
+                onConfirm: () => _signOut(ref),
+              ),
+              child: Text(
+                'Hesabımı Sil',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.error,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -132,10 +148,7 @@ class DrawerListTile extends StatelessWidget {
     return ListTile(
       leading: icon,
       iconColor: Theme.of(context).colorScheme.primary,
-      title: Text(
-        title,
-        style: Theme.of(context).textTheme.bodyMedium,
-      ),
+      title: Text(title, style: Theme.of(context).textTheme.bodyMedium),
       onTap: onTap,
     );
   }

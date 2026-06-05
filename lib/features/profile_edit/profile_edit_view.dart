@@ -4,6 +4,7 @@ import 'package:fortuneapp/core/navigation/app_navigator.dart';
 import 'package:fortuneapp/features/profile_edit/profile_edit_providers.dart';
 import 'package:intl/intl.dart';
 
+import '../../core/models/user_model.dart';
 import '../../core/widgets/loading_dialog.dart';
 import '../../core/widgets/snackbar.dart';
 import '../../enums/gender_options.dart';
@@ -12,11 +13,81 @@ import '../../enums/work_status.dart';
 import '../../enums/zodiac_sign.dart';
 
 // Kullanıcının profil bilgilerini düzenleyip kaydettiği ekran.
-class ProfileEditView extends ConsumerWidget {
+class ProfileEditView extends ConsumerStatefulWidget {
   const ProfileEditView({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ProfileEditView> createState() => _ProfileEditViewState();
+}
+
+// Controller ömrünü yöneten ve geçici state'i picker'larla güncelleyen state.
+class _ProfileEditViewState extends ConsumerState<ProfileEditView> {
+  final _nameController = TextEditingController();
+  final _locationController = TextEditingController();
+  final _genderController = TextEditingController();
+  final _birthDateController = TextEditingController();
+  final _birthTimeController = TextEditingController();
+  final _zodiacController = TextEditingController();
+  final _workStateController = TextEditingController();
+  final _relationShipController = TextEditingController();
+
+  // Controller'lar bir kez kullanıcıyla dolduruldu mu.
+  bool _seeded = false;
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _locationController.dispose();
+    _genderController.dispose();
+    _birthDateController.dispose();
+    _birthTimeController.dispose();
+    _zodiacController.dispose();
+    _workStateController.dispose();
+    _relationShipController.dispose();
+    super.dispose();
+  }
+
+  // Kullanıcı ilk geldiğinde tüm alanları (ad dahil) doldurur.
+  void _seed(UserModel user) {
+    _nameController.text = user.name;
+    _locationController.text = user.location;
+    _syncReadOnly(user);
+    _seeded = true;
+  }
+
+  // Picker ile değişen salt-okunur alanları güncel state'e eşitler (ad hariç).
+  void _syncReadOnly(UserModel user) {
+    // Saklanan '.name' değerini Türkçe etikete çevirerek gösterir.
+    _genderController.text =
+        GenderOption.values
+            .where((g) => g.name == user.gender)
+            .firstOrNull
+            ?.displayName ??
+        user.gender;
+    _birthDateController.text = DateFormat('dd.MM.yyyy').format(user.birthDate);
+    _birthTimeController.text = DateFormat('HH:mm').format(user.birthDate);
+    _zodiacController.text = ZodiacSign.values
+        .firstWhere(
+          (z) => z.name == user.zodiacSign,
+          orElse: () => ZodiacSign.aries,
+        )
+        .turkishName;
+    _workStateController.text = WorkStatus.values
+        .firstWhere(
+          (w) => w.name == user.workState,
+          orElse: () => WorkStatus.student,
+        )
+        .turkishName;
+    _relationShipController.text = RelationshipStatus.values
+        .firstWhere(
+          (r) => r.name == user.relationshipState,
+          orElse: () => RelationshipStatus.single,
+        )
+        .turkishName;
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final user = ref.watch(profileEditViewModelProvider);
     final notifier = ref.read(profileEditViewModelProvider.notifier);
 
@@ -24,36 +95,12 @@ class ProfileEditView extends ConsumerWidget {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    final nameController = TextEditingController(text: user.name);
-    final genderController = TextEditingController(text: user.gender);
-    final birthDateController = TextEditingController(
-        text: DateFormat('dd.MM.yyyy').format(user.birthDate));
-    final birthTimeController = TextEditingController(
-        text: DateFormat('HH:mm').format(user.birthDate));
-    final zodiacController = TextEditingController(
-      text: ZodiacSign.values
-          .firstWhere(
-            (z) => z.name == user.zodiacSign,
-            orElse: () => ZodiacSign.aries,
-          )
-          .turkishName,
-    );
-    final workStateController = TextEditingController(
-      text: WorkStatus.values
-          .firstWhere(
-            (w) => w.name == user.workState,
-            orElse: () => WorkStatus.student,
-          )
-          .turkishName,
-    );
-    final relationShipStateController = TextEditingController(
-      text: RelationshipStatus.values
-          .firstWhere(
-            (r) => r.name == user.relationShipState,
-            orElse: () => RelationshipStatus.single,
-          )
-          .turkishName,
-    );
+    // İlk kullanıcıda her şeyi doldur, sonrasında sadece readOnly alanları eşitle.
+    if (!_seeded) {
+      _seed(user);
+    } else {
+      _syncReadOnly(user);
+    }
 
     return Scaffold(
       appBar: AppBar(title: const Text('Profili Düzenle')),
@@ -63,52 +110,54 @@ class ProfileEditView extends ConsumerWidget {
           child: Column(
             children: [
               TextField(
-                controller: nameController,
+                controller: _nameController,
                 decoration: const InputDecoration(labelText: 'Ad'),
                 onChanged: (value) => notifier.updateUser(name: value),
               ),
               TextField(
-                controller: genderController,
-                decoration: const InputDecoration(
-                  labelText: 'Cinsiyet',
-                  suffixIcon: Icon(Icons.keyboard_arrow_down_outlined),
-                ),
-                readOnly: true,
+                controller: _locationController,
+                decoration: const InputDecoration(labelText: 'Şehir'),
+                onChanged: (value) => notifier.updateUser(location: value),
+              ),
+              _PickerField(
+                controller: _genderController,
+                label: 'Cinsiyet',
                 onTap: () => _showBottomPicker<GenderOption>(
                   context,
                   values: GenderOption.values,
                   displayText: (g) => g.displayName,
-                  onSelected: (v) => notifier.updateUser(gender: v.displayName),
+                  onSelected: (v) => notifier.updateUser(gender: v.name),
                 ),
               ),
-              TextField(
-                controller: birthDateController,
-                decoration: const InputDecoration(
-                  labelText: 'Doğum Tarihi',
-                  suffixIcon: Icon(Icons.keyboard_arrow_down_outlined),
-                ),
-                readOnly: true,
+              _PickerField(
+                controller: _birthDateController,
+                label: 'Doğum Tarihi',
                 onTap: () async {
                   final pickedDate = await showDatePicker(
                     context: context,
-                    initialDate: DateTime.now(),
+                    initialDate: user.birthDate,
                     firstDate: DateTime(1950),
                     lastDate: DateTime.now(),
                   );
-                  notifier.updateUser(birthDate: pickedDate);
+                  if (pickedDate != null) {
+                    final merged = DateTime(
+                      pickedDate.year,
+                      pickedDate.month,
+                      pickedDate.day,
+                      user.birthDate.hour,
+                      user.birthDate.minute,
+                    );
+                    notifier.updateUser(birthDate: merged);
+                  }
                 },
               ),
-              TextField(
-                controller: birthTimeController,
-                decoration: const InputDecoration(
-                  labelText: 'Doğum Saati',
-                  suffixIcon: Icon(Icons.keyboard_arrow_down_outlined),
-                ),
-                readOnly: true,
+              _PickerField(
+                controller: _birthTimeController,
+                label: 'Doğum Saati',
                 onTap: () async {
                   final pickedTime = await showTimePicker(
                     context: context,
-                    initialTime: TimeOfDay.now(),
+                    initialTime: TimeOfDay.fromDateTime(user.birthDate),
                   );
                   if (pickedTime != null) {
                     final finalDateTime = DateTime(
@@ -122,13 +171,9 @@ class ProfileEditView extends ConsumerWidget {
                   }
                 },
               ),
-              TextField(
-                controller: zodiacController,
-                decoration: const InputDecoration(
-                  labelText: 'Burcun',
-                  suffixIcon: Icon(Icons.keyboard_arrow_down_outlined),
-                ),
-                readOnly: true,
+              _PickerField(
+                controller: _zodiacController,
+                label: 'Burcun',
                 onTap: () => _showBottomPicker<ZodiacSign>(
                   context,
                   values: ZodiacSign.values,
@@ -136,13 +181,9 @@ class ProfileEditView extends ConsumerWidget {
                   onSelected: (v) => notifier.updateUser(zodiacSign: v.name),
                 ),
               ),
-              TextField(
-                controller: workStateController,
-                decoration: const InputDecoration(
-                  labelText: 'Meslek',
-                  suffixIcon: Icon(Icons.keyboard_arrow_down_outlined),
-                ),
-                readOnly: true,
+              _PickerField(
+                controller: _workStateController,
+                label: 'Meslek',
                 onTap: () => _showBottomPicker<WorkStatus>(
                   context,
                   values: WorkStatus.values,
@@ -150,19 +191,15 @@ class ProfileEditView extends ConsumerWidget {
                   onSelected: (v) => notifier.updateUser(workState: v.name),
                 ),
               ),
-              TextField(
-                controller: relationShipStateController,
-                decoration: const InputDecoration(
-                  labelText: 'İlişki Durumu',
-                  suffixIcon: Icon(Icons.keyboard_arrow_down_outlined),
-                ),
-                readOnly: true,
+              _PickerField(
+                controller: _relationShipController,
+                label: 'İlişki Durumu',
                 onTap: () => _showBottomPicker<RelationshipStatus>(
                   context,
                   values: RelationshipStatus.values,
                   displayText: (s) => s.turkishName,
                   onSelected: (v) =>
-                      notifier.updateUser(relationShipState: v.name),
+                      notifier.updateUser(relationshipState: v.name),
                 ),
               ),
               ElevatedButton(
@@ -171,7 +208,9 @@ class ProfileEditView extends ConsumerWidget {
                   await notifier.saveUserChanges();
                   if (context.mounted) LoadingDialog.hide(context);
                   CustomSnackBar.show('Profil Güncellendi');
-                  ref.read(appNavigatorProvider).pop();
+                  if (context.mounted) {
+                    ref.read(appNavigatorProvider).pop();
+                  }
                 },
                 child: const Text('Güncelle'),
               ),
@@ -206,6 +245,32 @@ class ProfileEditView extends ConsumerWidget {
           ),
         );
       },
+    );
+  }
+}
+
+// Dokununca picker açan salt-okunur metin alanı.
+class _PickerField extends StatelessWidget {
+  const _PickerField({
+    required this.controller,
+    required this.label,
+    required this.onTap,
+  });
+
+  final TextEditingController controller;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: controller,
+      readOnly: true,
+      decoration: InputDecoration(
+        labelText: label,
+        suffixIcon: const Icon(Icons.keyboard_arrow_down_outlined),
+      ),
+      onTap: onTap,
     );
   }
 }

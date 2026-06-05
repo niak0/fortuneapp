@@ -2,7 +2,15 @@ import 'package:flutter/material.dart';
 
 import '../features/sider_bar/sider_bar.dart';
 
-enum DrawerItems { profile, addGold, contactUs, termsOfService, privacyPolicy, feedback, settings }
+enum DrawerItems {
+  profile,
+  addGold,
+  contactUs,
+  termsOfService,
+  privacyPolicy,
+  feedback,
+  settings,
+}
 
 extension DrawerItemsExtension on DrawerItems {
   DrawerListTile customListTile({required VoidCallback onTap}) {
@@ -10,9 +18,7 @@ extension DrawerItemsExtension on DrawerItems {
       case DrawerItems.profile:
         return DrawerListTile(
           title: "Profil",
-          icon: const Icon(
-            Icons.home,
-          ),
+          icon: const Icon(Icons.person_outline),
           onTap: onTap,
         );
       case DrawerItems.addGold:
@@ -48,17 +54,7 @@ extension DrawerItemsExtension on DrawerItems {
       case DrawerItems.settings:
         return DrawerListTile(
           title: "Ayarlar",
-          icon: const Icon(
-            Icons.settings,
-          ),
-          onTap: onTap,
-        );
-      default:
-        return DrawerListTile(
-          title: "Unknown",
-          icon: const Icon(
-            Icons.help,
-          ),
+          icon: const Icon(Icons.settings_outlined),
           onTap: onTap,
         );
     }

@@ -10,9 +10,7 @@ class ChineseZodiac extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(
-      currentUserProvider.select((value) => value.value),
-    );
+    final user = ref.watch(currentUserProvider.select((value) => value.value));
     if (user == null) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
@@ -26,30 +24,35 @@ class ChineseZodiac extends ConsumerWidget {
         child: Column(
           children: [
             Card(
-                child: ListTile(
-              title: const Text("Hayvan"),
-              trailing: Text(animal.turkishName),
-            )),
+              child: ListTile(
+                title: const Text("Hayvan"),
+                trailing: Text(animal.turkishName),
+              ),
+            ),
             Card(
-                child: ListTile(
-              title: const Text("Astral Element"),
-              trailing: Text(animal.element),
-            )),
+              child: ListTile(
+                title: const Text("Astral Element"),
+                trailing: Text(animal.element),
+              ),
+            ),
             Card(
-                child: ListTile(
-              title: const Text("Yönetici Gezegen"),
-              trailing: Text(animal.rulingPlanet),
-            )),
+              child: ListTile(
+                title: const Text("Yönetici Gezegen"),
+                trailing: Text(animal.rulingPlanet),
+              ),
+            ),
             Card(
-                child: ListTile(
-              title: const Text("Uğurlu Sayılar"),
-              trailing: Text(animal.luckyNumbers.join(', ')),
-            )),
+              child: ListTile(
+                title: const Text("Uğurlu Sayılar"),
+                trailing: Text(animal.luckyNumbers.join(', ')),
+              ),
+            ),
             Card(
-                child: ListTile(
-              title: const Text("Taşları"),
-              trailing: Text(animal.luckyStones.join(', ')),
-            )),
+              child: ListTile(
+                title: const Text("Taşları"),
+                trailing: Text(animal.luckyStones.join(', ')),
+              ),
+            ),
           ],
         ),
       ),

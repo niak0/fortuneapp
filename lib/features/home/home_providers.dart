@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../core/data/fortune_repository.dart';
@@ -12,17 +11,15 @@ part 'home_providers.g.dart';
 @riverpod
 class HomeViewModel extends _$HomeViewModel {
   @override
-  Stream<List<ContentModel>> build() {
+  Stream<List<FortuneModel>> build() {
     final repo = ref.watch(fortuneRepositoryProvider);
+    // Stream hatası AsyncValue.error olarak yüzeye çıkar; sessizce yutulmaz.
     return repo.watchAll().map((fortunes) {
       return fortunes.where((fortune) {
         final isUnread = !(fortune.isRead ?? true);
         final isNotAccessible = !(fortune.isAccessible ?? true);
         return isNotAccessible || isUnread;
       }).toList();
-    }).handleError((Object error) {
-      if (kDebugMode) print('Stream error: $error');
-      return <ContentModel>[];
     });
   }
 

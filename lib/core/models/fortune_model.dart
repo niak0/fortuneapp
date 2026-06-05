@@ -1,65 +1,67 @@
 import 'package:intl/intl.dart';
+import 'package:json_annotation/json_annotation.dart';
 
-class ContentModel {
+import '../../enums/fortune_topic.dart';
+import '../../enums/gpt_content_type.dart';
+import 'converters/enum_converters.dart';
+import 'converters/timestamp_converter.dart';
+
+part 'fortune_model.g.dart';
+
+// Bir fal kaydını temsil eden domain modeli (Firestore: users/{uid}/fortunes).
+@JsonSerializable(explicitToJson: true)
+class FortuneModel {
+  // Firestore doküman id'si; gövdeden okunmaz/yazılmaz, doc.id'den set edilir.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   String? id;
+
+  @TimestampConverter()
   DateTime? createdTime;
+
+  @TimestampConverter()
   DateTime? unlockTime;
+
   String? fortune;
   String? userId;
-  String? fortuneType;
-  String? fortuneTopic;
+
+  @ContentTypeConverter()
+  ContentType? fortuneType;
+
+  @FortuneTopicConverter()
+  FortuneTopic? fortuneTopic;
+
   bool? isRead;
   bool? isAccessible;
 
-  ContentModel(
-      {this.id,
-      this.createdTime,
-      this.unlockTime,
-      this.fortune,
-      this.userId,
-      this.fortuneType,
-      this.fortuneTopic,
-      this.isRead = false,
-      this.isAccessible = false});
+  FortuneModel({
+    this.id,
+    this.createdTime,
+    this.unlockTime,
+    this.fortune,
+    this.userId,
+    this.fortuneType,
+    this.fortuneTopic,
+    this.isRead = false,
+    this.isAccessible = false,
+  });
 
-  factory ContentModel.fromJson(Map<String, dynamic> json, String id) {
-    return ContentModel(
-      id: id,
-      createdTime: json['createdTime'],
-      unlockTime: json['unlockTime'],
-      fortune: json['fortune'],
-      userId: json['userId'],
-      fortuneType: json['fortuneType'],
-      fortuneTopic: json['fortuneTopic'],
-      isRead: json['isRead'],
-      isAccessible: json['isAccessible'],
-    );
-  }
+  factory FortuneModel.fromJson(Map<String, dynamic> json) =>
+      _$FortuneModelFromJson(json);
 
-  Map<String, dynamic> toJson() {
-    return {
-      'createdTime': createdTime,
-      'unlockTime': unlockTime,
-      'fortune': fortune,
-      'userId': userId,
-      'fortuneType': fortuneType,
-      'fortuneTopic': fortuneTopic,
-      'isRead': isRead,
-      'isAccessible': isAccessible,
-    };
-  }
+  Map<String, dynamic> toJson() => _$FortuneModelToJson(this);
 
-  ContentModel copyWith(
-      {String? id,
-      DateTime? createdTime,
-      DateTime? unlockTime,
-      String? fortune,
-      String? userId,
-      String? fortuneType,
-      String? fortuneTopic,
-      bool? isRead,
-      bool? isAccessible}) {
-    return ContentModel(
+  FortuneModel copyWith({
+    String? id,
+    DateTime? createdTime,
+    DateTime? unlockTime,
+    String? fortune,
+    String? userId,
+    ContentType? fortuneType,
+    FortuneTopic? fortuneTopic,
+    bool? isRead,
+    bool? isAccessible,
+  }) {
+    return FortuneModel(
       id: id ?? this.id,
       createdTime: createdTime ?? this.createdTime,
       unlockTime: unlockTime ?? this.unlockTime,
@@ -72,7 +74,7 @@ class ContentModel {
     );
   }
 
-  // Formatlanmış tarih döndüren getter
+  // Formatlanmış tarih döndüren getter.
   String get formattedDate {
     if (createdTime != null) {
       return DateFormat('dd/MM/yyyy HH:mm').format(createdTime!);

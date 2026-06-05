@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:fortuneapp/core/theme/mystic_tokens.dart';
 
 abstract class NumerologyItem {
   String get displayName;
   String get description;
-  Color get color;
+  Color color(MysticTokens tokens);
   String get title;
   IconData get icon;
 }
@@ -18,7 +19,7 @@ enum BirthDateCalculations implements NumerologyItem {
   generation; // :)
 
   @override
-  Color get color => Colors.brown;
+  Color color(MysticTokens tokens) => tokens.gold;
 
   @override
   String get title => "Doğum Tarihi ile Hesaplananlar";
@@ -34,8 +35,6 @@ enum BirthDateCalculations implements NumerologyItem {
         return "Tutum";
       case BirthDateCalculations.generation:
         return "Jenerasyon"; // Jenerasyon yerine Kuşak daha anlaşılır olabilir.
-      default:
-        return "";
     }
   }
 
@@ -66,7 +65,7 @@ enum NameCalculations implements NumerologyItem {
   maturity;
 
   @override
-  Color get color => Colors.indigo;
+  Color color(MysticTokens tokens) => tokens.flame;
 
   @override
   String get title => "İsim ile Hesaplananlar";
@@ -84,8 +83,6 @@ enum NameCalculations implements NumerologyItem {
         return "Gizli Tutkular";
       case NameCalculations.maturity:
         return "Olgunluk";
-      default:
-        return "";
     }
   }
 
@@ -116,7 +113,7 @@ enum TimeCycles implements NumerologyItem {
   personalYear;
 
   @override
-  Color get color => Colors.purple;
+  Color color(MysticTokens tokens) => tokens.health;
 
   @override
   String get description {
@@ -127,8 +124,6 @@ enum TimeCycles implements NumerologyItem {
         return "Bu ayın en iyi günleri, en kötü günleri ve en iyi ve en kötü günlerin arasındaki farkı hesaplamak için kullanılır.";
       case TimeCycles.personalDay:
         return "Bu günün en iyi günleri, en kötü günleri ve en iyi ve en kötü günlerin arasındaki farkı hesaplamak için kullanılır.";
-      default:
-        return "";
     }
   }
 
@@ -144,8 +139,6 @@ enum TimeCycles implements NumerologyItem {
         return "Aylık";
       case TimeCycles.personalDay:
         return "Günlük";
-      default:
-        return "";
     }
   }
 

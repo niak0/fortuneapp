@@ -26,8 +26,7 @@ class GoRouterAppNavigator implements AppNavigator {
   GoRouter get _router => _ref.read(goRouterProvider);
 
   @override
-  GlobalKey<NavigatorState> get key =>
-      _router.routerDelegate.navigatorKey;
+  GlobalKey<NavigatorState> get key => _router.routerDelegate.navigatorKey;
 
   @override
   BuildContext? get currentContext => key.currentContext;

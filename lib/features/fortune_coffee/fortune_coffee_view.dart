@@ -43,15 +43,27 @@ class _FortuneCoffeeViewState extends ConsumerState<FortuneCoffeeView> {
     final notifier = ref.read(fortuneCoffeeViewModelProvider.notifier);
 
     return currentUserAsync.when(
-      loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),
+      loading: () =>
+          const Scaffold(body: Center(child: CircularProgressIndicator())),
       error: (e, _) => Scaffold(body: Center(child: Text('Hata: $e'))),
       data: (currentUser) {
         if (currentUser == null) {
           return const Scaffold(body: Center(child: Text('Kullanıcı yok')));
         }
-        _userInfoController.text = '${currentUser.gender}, ${currentUser.age}, '
-            '${WorkStatus.values.firstWhere((w) => w.name == currentUser.workState).turkishName}, '
-            '${RelationshipStatus.values.firstWhere((r) => r.name == currentUser.relationShipState).turkishName}';
+        final work = WorkStatus.values
+            .where((w) => w.name == currentUser.workState)
+            .firstOrNull
+            ?.turkishName;
+        final relationship = RelationshipStatus.values
+            .where((r) => r.name == currentUser.relationshipState)
+            .firstOrNull
+            ?.turkishName;
+        _userInfoController.text = [
+          currentUser.gender,
+          '${currentUser.age}',
+          ?work,
+          ?relationship,
+        ].join(', ');
 
         return Scaffold(
           appBar: AppBar(),
@@ -66,7 +78,8 @@ class _FortuneCoffeeViewState extends ConsumerState<FortuneCoffeeView> {
                   _PhotoPickerRow(photos: state.photos, notifier: notifier),
                   const SizedBox(height: 10),
                   _buildUserInfoTextField(
-                    onTap: () => ref.read(appNavigatorProvider)
+                    onTap: () => ref
+                        .read(appNavigatorProvider)
                         .pushToPage(AppRoutes.profileEdit),
                   ),
                   const SizedBox(height: 10),
@@ -82,9 +95,11 @@ class _FortuneCoffeeViewState extends ConsumerState<FortuneCoffeeView> {
                         return CustomSnackBar.show(_snackbarText);
                       }
                       LoadingDialog.show(context);
-                      await notifier.getFortuneAndSaveFirebase(currentUser);
+                      final ok = await notifier.getFortuneAndSaveFirebase(
+                        currentUser,
+                      );
                       if (context.mounted) LoadingDialog.hide(context);
-                      ref.read(appNavigatorProvider).pop();
+                      if (ok) ref.read(appNavigatorProvider).pop();
                     },
                   ),
                 ],

@@ -16,12 +16,15 @@ void main() {
         zodiacSign: 'capricorn',
         gender: 'female',
         workState: 'student',
-        relationShipState: 'single',
+        relationshipState: 'single',
       );
-      final container = makeContainer(overrides: [
-        userRepositoryProvider
-            .overrideWithValue(FakeUserRepository(initial: initial)),
-      ]);
+      final container = makeContainer(
+        overrides: [
+          userRepositoryProvider.overrideWithValue(
+            FakeUserRepository(initial: initial),
+          ),
+        ],
+      );
 
       final user = await container.read(currentUserProvider.future);
 
@@ -29,7 +32,24 @@ void main() {
       expect(user!.name, 'Ada');
     });
 
-    test('incrementGold mevcut altını artırır', () async {
+    test(
+      'profil yoksa varsayılan (Misafir) profil otomatik oluşturulur',
+      () async {
+        final container = makeContainer(
+          overrides: [
+            userRepositoryProvider.overrideWithValue(FakeUserRepository()),
+          ],
+        );
+
+        final user = await container.read(currentUserProvider.future);
+
+        expect(user, isNotNull);
+        expect(user!.name, 'Misafir');
+        expect(user.coin, 3);
+      },
+    );
+
+    test('incrementGold altını artırır ve Firestore\'a kalıcı yazar', () async {
       final initial = UserModel(
         name: 'Ada',
         birthDate: DateTime(1990, 1, 1),
@@ -37,19 +57,51 @@ void main() {
         zodiacSign: '',
         gender: '',
         workState: '',
-        relationShipState: '',
+        relationshipState: '',
         coin: 5,
       );
-      final container = makeContainer(overrides: [
-        userRepositoryProvider
-            .overrideWithValue(FakeUserRepository(initial: initial)),
-      ]);
+      final fake = FakeUserRepository(initial: initial);
+      final container = makeContainer(
+        overrides: [userRepositoryProvider.overrideWithValue(fake)],
+      );
       await container.read(currentUserProvider.future);
 
-      container.read(currentUserProvider.notifier).incrementGold(amount: 3);
+      await container
+          .read(currentUserProvider.notifier)
+          .incrementGold(amount: 3);
 
       final user = container.read(currentUserProvider).value;
       expect(user?.coin, 8);
+      // Bellekte değil Firestore'a da yazıldığını doğrula (gold persistence bug).
+      expect(fake.updateCallCount, 1);
+    });
+
+    test('update hata verirse altın state geri alınır (rollback)', () async {
+      final initial = UserModel(
+        name: 'Ada',
+        birthDate: DateTime(1990, 1, 1),
+        location: '',
+        zodiacSign: '',
+        gender: '',
+        workState: '',
+        relationshipState: '',
+        coin: 5,
+      );
+      final container = makeContainer(
+        overrides: [
+          userRepositoryProvider.overrideWithValue(
+            FakeUserRepository(initial: initial, failOnUpdate: true),
+          ),
+        ],
+      );
+      await container.read(currentUserProvider.future);
+
+      await container
+          .read(currentUserProvider.notifier)
+          .incrementGold(amount: 3);
+
+      // Persist başarısız → optimistic değişiklik geri alınır.
+      expect(container.read(currentUserProvider).value?.coin, 5);
     });
   });
 }

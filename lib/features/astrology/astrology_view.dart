@@ -35,10 +35,7 @@ class _AstrologyViewState extends State<AstrologyView> {
         ),
         body: IndexedStack(
           index: _selectedIndex,
-          children: const [
-            ZodiacView(),
-            ChineseZodiac(),
-          ],
+          children: const [ZodiacView(), ChineseZodiac()],
         ),
       ),
     );

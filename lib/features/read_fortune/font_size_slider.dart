@@ -50,4 +50,3 @@ class FontSizeSliderState extends State<FontSizeSlider> {
     );
   }
 }
-

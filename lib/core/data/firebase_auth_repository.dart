@@ -17,8 +17,8 @@ void _logErr(String message, Object error, [StackTrace? stack]) =>
 // Firebase Auth + Google + Apple üzerinden gerçek auth işlemleri.
 class FirebaseAuthRepository implements AuthRepository {
   FirebaseAuthRepository({fb.FirebaseAuth? auth, GoogleSignIn? googleSignIn})
-      : _auth = auth ?? fb.FirebaseAuth.instance,
-        _googleSignIn = googleSignIn ?? GoogleSignIn.instance;
+    : _auth = auth ?? fb.FirebaseAuth.instance,
+      _googleSignIn = googleSignIn ?? GoogleSignIn.instance;
 
   final fb.FirebaseAuth _auth;
   final GoogleSignIn _googleSignIn;
@@ -38,17 +38,19 @@ class FirebaseAuthRepository implements AuthRepository {
 
   @override
   Stream<AuthUser?> authStateChanges() => _auth.authStateChanges().map((u) {
-        final mapped = _map(u);
-        if (mapped == null) {
-          _log('authStateChanges → signed-out');
-        } else {
-          _log('authStateChanges → uid=${mapped.uid} '
-              'anon=${mapped.isAnonymous} '
-              'providers=${mapped.providerIds} '
-              'email=${mapped.email}');
-        }
-        return mapped;
-      });
+    final mapped = _map(u);
+    if (mapped == null) {
+      _log('authStateChanges → signed-out');
+    } else {
+      _log(
+        'authStateChanges → uid=${mapped.uid} '
+        'anon=${mapped.isAnonymous} '
+        'providers=${mapped.providerIds} '
+        'email=${mapped.email}',
+      );
+    }
+    return mapped;
+  });
 
   @override
   AuthUser? get currentUser => _map(_auth.currentUser);
@@ -76,8 +78,10 @@ class FirebaseAuthRepository implements AuthRepository {
       _log('Anon kullanıcı (uid=${current.uid}) → linkWithCredential');
       try {
         final cred = await current.linkWithCredential(credential);
-        _log('linkWithCredential OK → uid=${cred.user?.uid} '
-            'providers=${cred.user?.providerData.map((p) => p.providerId).toList()}');
+        _log(
+          'linkWithCredential OK → uid=${cred.user?.uid} '
+          'providers=${cred.user?.providerData.map((p) => p.providerId).toList()}',
+        );
         return _map(cred.user);
       } on fb.FirebaseAuthException catch (e, s) {
         _logErr('linkWithCredential FAILED (code=${e.code})', e, s);
@@ -110,7 +114,9 @@ class FirebaseAuthRepository implements AuthRepository {
       final account = await _googleSignIn.authenticate();
       _log('Google authenticate OK → email=${account.email}');
       final auth = account.authentication;
-      final credential = fb.GoogleAuthProvider.credential(idToken: auth.idToken);
+      final credential = fb.GoogleAuthProvider.credential(
+        idToken: auth.idToken,
+      );
       return _signInOrLink(credential);
     } catch (e, s) {
       _logErr('signInWithGoogle() FAILED', e, s);

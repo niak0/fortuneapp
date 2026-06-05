@@ -3,6 +3,9 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'gold_manager.g.dart';
 
+// Bir fal oluşturmanın altın maliyeti (tüm fal akışları paylaşır).
+const kFortuneCost = 1;
+
 // Altın kontrol/işlem mantığını CurrentUser'a delege eden servis.
 class GoldManager {
   GoldManager(this._ref);
@@ -16,12 +19,12 @@ class GoldManager {
 
   // Mevcut kullanıcıya altın ekler.
   Future<void> increaseGold({required int amount}) async {
-    _ref.read(currentUserProvider.notifier).incrementGold(amount: amount);
+    await _ref.read(currentUserProvider.notifier).incrementGold(amount: amount);
   }
 
-  // Mevcut kullanıcıdan 1 altın düşer.
-  Future<void> decreaseGold() async {
-    _ref.read(currentUserProvider.notifier).decrementGold(1);
+  // Mevcut kullanıcıdan `amount` (varsayılan 1) altın düşer.
+  Future<void> decreaseGold([int amount = 1]) async {
+    await _ref.read(currentUserProvider.notifier).decrementGold(amount);
   }
 }
 

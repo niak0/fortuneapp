@@ -1,4 +1,5 @@
-import 'package:flutter/foundation.dart';
+import 'dart:developer' as developer;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -22,9 +23,16 @@ class _SignInSheetState extends ConsumerState<SignInSheet> {
     try {
       await action();
       if (mounted) Navigator.of(context).pop();
-    } catch (e) {
-      if (kDebugMode) debugPrint('SignInSheet error: $e');
-      ref.read(uiHelperProvider).showSnackBar('Giriş başarısız. Tekrar deneyin.');
+    } catch (e, s) {
+      developer.log(
+        'SignInSheet error',
+        name: 'auth.signin',
+        error: e,
+        stackTrace: s,
+      );
+      ref
+          .read(uiHelperProvider)
+          .showSnackBar('Giriş başarısız. Tekrar deneyin.');
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -39,10 +47,7 @@ class _SignInSheetState extends ConsumerState<SignInSheet> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              'Hesabını kaydet',
-              style: theme.textTheme.headlineSmall,
-            ),
+            Text('Hesabını kaydet', style: theme.textTheme.headlineSmall),
             const SizedBox(height: 8),
             Text(
               'Verilerin kaybolmasın diye Apple ya da Google ile giriş yap.',
@@ -54,9 +59,8 @@ class _SignInSheetState extends ConsumerState<SignInSheet> {
               icon: Icons.apple,
               label: 'Apple ile devam et',
               busy: _busy,
-              onPressed: () => _run(
-                () => ref.read(authProvider.notifier).signInWithApple(),
-              ),
+              onPressed: () =>
+                  _run(() => ref.read(authProvider.notifier).signInWithApple()),
             ),
             const SizedBox(height: 8),
             _OAuthButton(
@@ -99,7 +103,7 @@ class _OAuthButton extends StatelessWidget {
           backgroundColor: theme.colorScheme.onPrimary,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
-            side: const BorderSide(width: 1, color: Colors.white),
+            side: BorderSide(width: 1, color: theme.colorScheme.outline),
           ),
           minimumSize: const Size.fromHeight(50),
         ),

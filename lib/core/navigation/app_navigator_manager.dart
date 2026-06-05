@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'app_navigator.dart';
-import 'app_router.dart';
 
 // DEPRECATED: Yeni kodda `appNavigatorProvider` kullanın.
 // Bu facade sadece `CustomSnackBar` / `LoadingDialog` gibi context-suz statik

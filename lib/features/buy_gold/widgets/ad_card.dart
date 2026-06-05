@@ -5,8 +5,9 @@ class AdCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Card(
-      color: Colors.brown[700],
+      color: scheme.surfaceContainerHigh,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: ListTile(
         onTap: () {
@@ -20,7 +21,7 @@ class AdCard extends StatelessWidget {
                   TextButton(
                     onPressed: () => Navigator.pop(context),
                     child: const Text("ok"),
-                  )
+                  ),
                 ],
               );
             },
@@ -28,17 +29,24 @@ class AdCard extends StatelessWidget {
         },
         dense: true,
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        title: const Text(
+        title: Text(
           "Reklam İzle Kredi Kazan",
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+          style: TextStyle(
+            color: scheme.onSurface,
+            fontWeight: FontWeight.w500,
+          ),
         ),
-        leading: const Icon(Icons.video_library, color: Colors.orange),
+        leading: Icon(Icons.video_library, color: scheme.primary),
         trailing: ElevatedButton.icon(
           onPressed: null,
-          icon: const Icon(Icons.money_off_csred_outlined, color: Colors.white),
-          label: const Text("+1", style: TextStyle(color: Colors.white)),
-          style:
-          ElevatedButton.styleFrom(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)), disabledBackgroundColor: Colors.orange),
+          icon: Icon(Icons.money_off_csred_outlined, color: scheme.onPrimary),
+          label: Text("+1", style: TextStyle(color: scheme.onPrimary)),
+          style: ElevatedButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            disabledBackgroundColor: scheme.primary,
+          ),
         ),
       ),
     );
