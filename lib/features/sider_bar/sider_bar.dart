@@ -27,7 +27,7 @@ class SideBar extends ConsumerWidget {
               onPressed: () async {
                 Navigator.of(context).pop();
                 await ref.read(authProvider.notifier).signOut();
-                ref.read(appNavigatorProvider).pushAndRemoveUntil(AppRoutes.login);
+                ref.read(appNavigatorProvider).pushAndRemoveUntil(AppRoutes.home);
               },
               child: const Text("Çıkış Yap"),
             ),
@@ -55,7 +55,7 @@ class SideBar extends ConsumerWidget {
               onPressed: () async {
                 Navigator.of(context).pop();
                 // await context.read<AuthManager>().deleteUser();
-                // ref.read(appNavigatorProvider).pushAndRemoveUntil(AppRoutes.login);
+                // ref.read(appNavigatorProvider).pushAndRemoveUntil(AppRoutes.home);
               },
               child: const Text("Hesabı Sil", style: TextStyle(color: Colors.red, fontSize: 14)),
             ),

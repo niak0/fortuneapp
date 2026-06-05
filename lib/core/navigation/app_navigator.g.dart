@@ -48,4 +48,4 @@ final class AppNavigatorProvider
   }
 }
 
-String _$appNavigatorHash() => r'58b0f774795133c90ccc4b6794e99457f1815dc7';
+String _$appNavigatorHash() => r'9509defd023e0378d2e464668e0b0c88f17dd4f2';

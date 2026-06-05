@@ -1,29 +1,39 @@
 import 'package:fortuneapp/core/data/auth_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import 'auth_bootstrap.dart';
+import 'auth_user.dart';
+
 part 'auth_notifier.g.dart';
 
-// Mock authentication state'ini tutan global Notifier.
+// Auth state'ini Firebase auth stream'inden besleyen global Notifier.
+// Stream her emit'ettiğinde rebuild olur — UI otomatik senkronize.
 @Riverpod(keepAlive: true)
 class AuthNotifier extends _$AuthNotifier {
   @override
-  bool build() => ref.watch(authRepositoryProvider).isLoggedIn;
-
-  // Mock login işlemi.
-  Future<bool> signIn({
-    String email = 'test@test.com',
-    String password = 'test123',
-  }) async {
-    final repo = ref.read(authRepositoryProvider);
-    final result = await repo.signIn(email: email, password: password);
-    state = repo.isLoggedIn;
-    return result;
+  AuthUser? build() {
+    final async = ref.watch(authStateChangesProvider);
+    return async.value ?? ref.read(authRepositoryProvider).currentUser;
   }
 
-  // Mock logout işlemi.
+  // Google ile devam et — anon ise upgrade, değilse normal sign-in.
+  Future<AuthUser?> signInWithGoogle() async {
+    final user = await ref.read(authRepositoryProvider).signInWithGoogle();
+    if (user != null) state = user; // stream'i beklemeden anında reflect et
+    return user;
+  }
+
+  // Apple ile devam et — anon ise upgrade, değilse normal sign-in.
+  Future<AuthUser?> signInWithApple() async {
+    final user = await ref.read(authRepositoryProvider).signInWithApple();
+    if (user != null) state = user;
+    return user;
+  }
+
+  // Oturumu kapatır; bootstrap yeni anon login üretir.
   Future<void> signOut() async {
-    final repo = ref.read(authRepositoryProvider);
-    await repo.signOut();
-    state = repo.isLoggedIn;
+    await ref.read(authRepositoryProvider).signOut();
+    state = null;
+    ref.invalidate(authBootstrapProvider);
   }
 }

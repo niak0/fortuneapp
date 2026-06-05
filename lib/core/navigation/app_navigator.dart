@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'app_navigator_manager.dart';
@@ -17,40 +18,43 @@ abstract class AppNavigator {
   void pop([Object? result]);
 }
 
-// Gerçek navigator key kullanan implementasyon.
-class RoutingNavigator implements AppNavigator {
-  RoutingNavigator(this._key);
+// go_router üzerinden çalışan AppNavigator implementasyonu.
+class GoRouterAppNavigator implements AppNavigator {
+  GoRouterAppNavigator(this._ref);
+  final Ref _ref;
 
-  final GlobalKey<NavigatorState> _key;
-
-  @override
-  GlobalKey<NavigatorState> get key => _key;
+  GoRouter get _router => _ref.read(goRouterProvider);
 
   @override
-  BuildContext? get currentContext => _key.currentContext;
+  GlobalKey<NavigatorState> get key =>
+      _router.routerDelegate.navigatorKey;
+
+  @override
+  BuildContext? get currentContext => key.currentContext;
 
   @override
   Future<dynamic>? pushToPage(AppRoutes route, {Object? arguments}) {
-    return _key.currentState?.pushNamed(route.path, arguments: arguments);
+    _router.push<dynamic>(route.path, extra: arguments);
+    return null;
   }
 
   @override
   Future<dynamic>? pushAndRemoveUntil(AppRoutes route, {Object? arguments}) {
-    return _key.currentState?.pushNamedAndRemoveUntil(
-      route.path,
-      (route) => false,
-      arguments: arguments,
-    );
+    _router.go(route.path, extra: arguments);
+    return null;
   }
 
   @override
   void pop([Object? result]) {
-    _key.currentState?.pop(result);
+    if (_router.canPop()) _router.pop(result);
   }
 }
 
-// AppNavigator DI provider'ı — AppNavigatorManager singleton'ını döner ki
-// statik helper'lar (CustomSnackBar, LoadingDialog) ile aynı navigator key'i paylaşsın.
-// Test'te `appNavigatorProvider.overrideWithValue(FakeNavigator())` ile mock'lanabilir.
+// AppNavigator DI provider'ı — go_router instance'ını sarar.
 @Riverpod(keepAlive: true)
-AppNavigator appNavigator(Ref ref) => AppNavigatorManager.instance;
+AppNavigator appNavigator(Ref ref) {
+  final nav = GoRouterAppNavigator(ref);
+  // Legacy facade'ın aynı key'i göstermesi için forward et.
+  AppNavigatorManager.bind(nav);
+  return nav;
+}

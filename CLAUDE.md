@@ -65,14 +65,32 @@ final user = await container.read(currentUserProvider.future);
 
 `test/helpers/fakes/` altında hazır fake'ler var. Yeni servis eklerken `core/data/` veya `core/ui/` benzeri abstract+impl+provider pattern'ini sürdür.
 
-### Navigasyon
+### Navigasyon — go_router
 
-`AppRouter` mixin → `MaterialApp.onGenerateRoute`. Yeni ekran eklerken:
+`MaterialApp.router` + `goRouterProvider` (`lib/core/navigation/app_router.dart`). `GoRouter` `refreshListenable` ile `authStateChanges` stream'ini dinler; bootstrap bitmediyse splash'te bekler, bittiğinde home'a redirect eder. `/login` route YOK — anon auto-login sayesinde gereksiz.
+
+Yeni ekran eklerken:
 1. `AppRoutes` enum'una değer ekle (`app_router.dart`).
-2. `app_router.dart` switch'ine `_navigateToNormal(...)` case'i ekle.
-3. View/Notifier içinden `ref.read(appNavigatorProvider).pushToPage(AppRoutes.x)` ile çağır.
+2. `goRouter` provider'ındaki `routes:` listesine `GoRoute(path: AppRoutes.x.path, builder: ...)` ekle.
+3. View/Notifier içinden `ref.read(appNavigatorProvider).pushToPage(AppRoutes.x, arguments: ...)` çağır — argument `state.extra` olarak gelir.
 
-Tam ekran modal'lar `isFullScreenDialog: true` (örn. `buyCredits`, `profileEdit`).
+`appNavigatorProvider` (`AppNavigator` abstract) `GoRouterAppNavigator` impl üzerinden çalışır; 35 callsite tek satır değişmeden korunur, test'te `FakeNavigator` ile override edilir. Tam ekran modal'lar `MaterialPage(fullscreenDialog: true, ...)` ile tanımlanır (`buyCredits`, `profileEdit`, `readFortune`).
+
+### Auth — Firebase (Anonymous-first + Google/Apple linking)
+
+App açılışında `authBootstrapProvider` Firebase anonymous login yapar (yoksa). UID hemen üretilir, kullanıcı arayüzü hiç bir login ekranı görmeden home'a düşer.
+
+Anasayfada `SignUpPromptBanner` (`features/home/widgets/sign_up_prompt_banner.dart`) anon kullanıcılara "verileriniz kaybolabilir, lütfen giriş yapın" uyarısı çıkarır. Tıklanca `SignInSheet` (bottom sheet) açılır → Apple / Google. OAuth flow'unda `FirebaseAuthRepository._signInOrLink` anon kullanıcıyı **`linkWithCredential`** ile upgrade eder; **UID korunur**, Firestore'daki coin/fal verisi kaybolmaz.
+
+`authProvider` (`AuthNotifier`) → `AuthUser?` (uid + isAnonymous + providerIds). View'lar `ref.watch(authProvider.select((u) => u?.isAnonymous))` ile reactif izler.
+
+Settings → Çıkış Yap → `authRepository.signOut()` → bootstrap yeni anon login yapar → banner geri gelir.
+
+**Native config (kullanıcı tarafından manuel):**
+- iOS `Info.plist`: `CFBundleURLTypes` içine `REVERSED_CLIENT_ID` koy (placeholder ile boş bırakıldı). Firebase Console → Authentication → Google Sign-In aktif et → yeni `GoogleService-Info.plist` indir → değeri kopyala.
+- iOS `Runner.entitlements`: `com.apple.developer.applesignin` zaten ekli ✓.
+- Apple Developer Console → App ID'de Sign in with Apple capability + Service ID + key setup.
+- Android: Firebase Console → Project Settings → SHA-1 ekle (`keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android`). Google + Apple + Anonymous provider'ları Authentication panelinden aktif et.
 
 ### Bağlantı kontrolü
 

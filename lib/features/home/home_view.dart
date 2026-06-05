@@ -6,6 +6,7 @@ import '../../core/auth/current_user.dart';
 import '../../core/navigation/app_navigator.dart';
 import 'model/home_items.dart';
 import 'widgets/build_stream_builder.dart';
+import 'widgets/sign_up_prompt_banner.dart';
 
 // Anasayfa — son fal balonu + fal kategori grid'i.
 class HomeView extends ConsumerWidget {
@@ -22,6 +23,7 @@ class HomeView extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const SignUpPromptBanner(),
             const BuildStreamBuilder(),
             Text(
               'İyi günler, ${userName ?? ''}',

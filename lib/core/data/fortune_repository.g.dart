@@ -54,4 +54,4 @@ final class FortuneRepositoryProvider
   }
 }
 
-String _$fortuneRepositoryHash() => r'086a1cbec892daa85f79c0c5e59c667a5dde042d';
+String _$fortuneRepositoryHash() => r'599e28893366ce0bcbb4b4190a6d391328169bef';

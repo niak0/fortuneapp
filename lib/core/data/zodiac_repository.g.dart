@@ -53,4 +53,4 @@ final class ZodiacRepositoryProvider
   }
 }
 
-String _$zodiacRepositoryHash() => r'2bd46f7a1508b78d6f18400569538bec25951166';
+String _$zodiacRepositoryHash() => r'523631c453e16ccf3042dfc341688885fbe28408';

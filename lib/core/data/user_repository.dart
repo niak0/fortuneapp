@@ -1,7 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../models/user_model.dart';
-import '../network/mock_service.dart';
+import 'firestore_user_repository.dart';
 
 part 'user_repository.g.dart';
 
@@ -11,20 +11,6 @@ abstract class UserRepository {
   Future<void> update(UserModel user);
 }
 
-// MockService üzerinden çalışan UserRepository implementasyonu.
-class MockUserRepository implements UserRepository {
-  @override
-  Future<UserModel?> fetchCurrent() async {
-    await MockService.initializeData();
-    return MockService.mockUser;
-  }
-
-  @override
-  Future<void> update(UserModel user) async {
-    await MockService.updateUserProfile(user.toJson());
-  }
-}
-
-// UserRepository DI provider'ı.
+// UserRepository DI provider'ı (production = FirestoreUserRepository).
 @Riverpod(keepAlive: true)
-UserRepository userRepository(Ref ref) => MockUserRepository();
+UserRepository userRepository(Ref ref) => FirestoreUserRepository();

@@ -1,21 +1,20 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../features/astrology/zodiac/zodiac_data.dart';
 import '../../features/astrology/zodiac/zodiac_model.dart';
-import '../network/mock_service.dart';
 
 part 'zodiac_repository.g.dart';
 
-// Burç verilerine erişim için abstract interface — testte override edilebilir.
+// Burç verilerine erişim için abstract interface.
 abstract class ZodiacRepository {
   Future<List<ZodiacModel>> fetchAll();
 }
 
-// MockService üzerinden çalışan ZodiacRepository implementasyonu.
-class MockZodiacRepository implements ZodiacRepository {
+// Bundle içindeki statik referans veriden çalışan implementasyon.
+class LocalZodiacRepository implements ZodiacRepository {
   @override
   Future<List<ZodiacModel>> fetchAll() async {
-    final data = await MockService.getZodiacModels();
-    return data
+    return zodiacReferenceData
         .map((json) => ZodiacModel(
               sign: json['sign'],
               planet: json['planet'],
@@ -37,4 +36,4 @@ class MockZodiacRepository implements ZodiacRepository {
 
 // ZodiacRepository DI provider'ı.
 @Riverpod(keepAlive: true)
-ZodiacRepository zodiacRepository(Ref ref) => MockZodiacRepository();
+ZodiacRepository zodiacRepository(Ref ref) => LocalZodiacRepository();

@@ -1,32 +1,35 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../network/mock_service.dart';
+import '../auth/auth_user.dart';
+import 'firebase_auth_repository.dart';
 
 part 'auth_repository.g.dart';
 
-// Authentication veri katmanı — testte override edilebilir.
+// Authentication için domain interface'i.
+// FirebaseAuthRepository (production) ve MockAuthRepository (test) implementasyonları.
 abstract class AuthRepository {
-  bool get isLoggedIn;
-  Future<bool> signIn({String email, String password});
+  // Auth state değişimlerini stream olarak yayınlar (sign-in/sign-out/anon).
+  Stream<AuthUser?> authStateChanges();
+
+  // Anlık snapshot — splash/bootstrap için.
+  AuthUser? get currentUser;
+
+  // Aktif kullanıcı anonim mi?
+  bool get isAnonymous;
+
+  // Anonim oturum açar (UID üretir).
+  Future<AuthUser?> signInAnonymously();
+
+  // Google ile giriş; anon ise linkWithCredential ile UID korunur.
+  Future<AuthUser?> signInWithGoogle();
+
+  // Apple ile giriş; anon ise linkWithCredential ile UID korunur.
+  Future<AuthUser?> signInWithApple();
+
+  // Oturumu kapatır (yeni anon login bootstrap tarafından sağlanır).
   Future<void> signOut();
 }
 
-// MockService üzerinden çalışan AuthRepository implementasyonu.
-class MockAuthRepository implements AuthRepository {
-  @override
-  bool get isLoggedIn => MockService.isUserLoggedIn;
-
-  @override
-  Future<bool> signIn({
-    String email = 'test@test.com',
-    String password = 'test123',
-  }) =>
-      MockService.signIn(email, password);
-
-  @override
-  Future<void> signOut() => MockService.signOut();
-}
-
-// AuthRepository DI provider'ı.
+// AuthRepository DI provider'ı (production = FirebaseAuthRepository).
 @Riverpod(keepAlive: true)
-AuthRepository authRepository(Ref ref) => MockAuthRepository();
+AuthRepository authRepository(Ref ref) => FirebaseAuthRepository();

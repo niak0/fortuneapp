@@ -45,8 +45,9 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
               }),
               _buildListTile('Çıkış Yap', () async {
                 await ref.read(authProvider.notifier).signOut();
+                // Bootstrap yeni anon login yapar; home'a düş.
                 if (context.mounted) {
-                  ref.read(appNavigatorProvider).pushAndRemoveUntil(AppRoutes.login);
+                  ref.read(appNavigatorProvider).pushAndRemoveUntil(AppRoutes.home);
                 }
               }),
             ]),
@@ -152,7 +153,7 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
               onPressed: () async {
                 await ref.read(authProvider.notifier).signOut();
                 if (context.mounted) {
-                  ref.read(appNavigatorProvider).pushAndRemoveUntil(AppRoutes.login);
+                  ref.read(appNavigatorProvider).pushAndRemoveUntil(AppRoutes.home);
                 }
               },
             ),

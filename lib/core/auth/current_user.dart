@@ -2,14 +2,18 @@ import 'package:fortuneapp/core/data/user_repository.dart';
 import 'package:fortuneapp/core/models/user_model.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import 'auth_bootstrap.dart';
+
 part 'current_user.g.dart';
 
 // Uygulama boyunca aktif kullanıcı state'i (Riverpod AsyncNotifier).
+// Auth state (uid) değişince profil otomatik yeniden yüklenir.
 @Riverpod(keepAlive: true)
 class CurrentUser extends _$CurrentUser {
   @override
-  Future<UserModel?> build() {
-    return ref.watch(userRepositoryProvider).fetchCurrent();
+  Future<UserModel?> build() async {
+    ref.watch(authStateChangesProvider);
+    return ref.read(userRepositoryProvider).fetchCurrent();
   }
 
   // Kullanıcıyı tamamen değiştirir.
