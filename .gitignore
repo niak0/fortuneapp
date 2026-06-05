@@ -46,3 +46,9 @@ app.*.map.json
 
 # Local AI context file
 CLAUDE.md
+
+# Secrets / environment (ASLA commit etme)
+.env
+*.env
+**/.env
+lib/core/config/env.dart
