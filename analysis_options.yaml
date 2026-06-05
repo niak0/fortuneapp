@@ -12,6 +12,13 @@ include: package:flutter_lints/flutter.yaml
 analyzer:
   plugins:
     - custom_lint
+  # Build çıktıları ve üretilen kaynaklar analiz dışı bırakılır.
+  exclude:
+    - build/**
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+    - ios/Pods/**
+    - .dart_tool/**
 
 linter:
   # The lint rules applied to this project can be customized in the
