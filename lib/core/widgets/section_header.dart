@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/mystic_tokens.dart';
+import '../theme/mystic_tokens.dart';
 
 // Altın yıldız + tracked başlık + sönümlenen çizgiden oluşan bölüm başlığı.
 class SectionHeader extends StatelessWidget {

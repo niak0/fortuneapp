@@ -2,10 +2,11 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 
+import '../../../core/theme/mystic_dimens.dart';
+import '../../../core/theme/mystic_tokens.dart';
+
+// Tek bir fincan fotoğrafı için premium (altın hairline) seçici slot.
 class PhotoPicker extends StatelessWidget {
-  final String photo;
-  final VoidCallback onPhotoTap;
-  final VoidCallback onDeleteTap;
   const PhotoPicker({
     super.key,
     required this.onPhotoTap,
@@ -13,55 +14,99 @@ class PhotoPicker extends StatelessWidget {
     required this.photo,
   });
 
+  final String photo;
+  final VoidCallback onPhotoTap;
+  final VoidCallback onDeleteTap;
+
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
-    return Stack(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          child: InkWell(
-            onTap: photo.isEmpty ? onPhotoTap : null,
-            child: Container(
-              width: screenWidth * 0.25,
-              height: screenHeight * 0.1,
-              decoration: BoxDecoration(
-                border: Border.all(
-                  style: BorderStyle.solid,
-                  color: Theme.of(context).colorScheme.secondary,
+    final tokens = MysticTokens.of(context);
+    final scheme = Theme.of(context).colorScheme;
+    final isEmpty = photo.isEmpty;
+
+    return AspectRatio(
+      aspectRatio: 1,
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: Material(
+              type: MaterialType.transparency,
+              child: InkWell(
+                borderRadius: MysticRadius.mdAll,
+                onTap: isEmpty ? onPhotoTap : null,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: scheme.surfaceContainerLow,
+                    borderRadius: MysticRadius.mdAll,
+                    border: Border.all(
+                      color: isEmpty ? tokens.line : tokens.lineStrong,
+                    ),
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: isEmpty
+                      ? _EmptySlot(tokens: tokens)
+                      : Image.file(File(photo), fit: BoxFit.cover),
                 ),
-                color: Theme.of(context).colorScheme.secondaryContainer,
               ),
-              child: photo.isEmpty
-                  ? Icon(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      Icons.add_a_photo_outlined,
-                      size: screenWidth * 0.15,
-                    )
-                  : Image.file(File(photo), fit: BoxFit.fill),
             ),
           ),
+          if (!isEmpty)
+            Positioned(
+              right: 6,
+              top: 6,
+              child: _DeleteBadge(onTap: onDeleteTap),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+// Boş slot içeriği: altın ekleme ikonu + "Ekle" etiketi.
+class _EmptySlot extends StatelessWidget {
+  const _EmptySlot({required this.tokens});
+
+  final MysticTokens tokens;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(Icons.add_a_photo_outlined, size: 26, color: tokens.gold),
+        const SizedBox(height: MysticSpace.x1),
+        Text(
+          'Ekle',
+          style: Theme.of(
+            context,
+          ).textTheme.labelSmall?.copyWith(color: tokens.inkFaint),
         ),
-        if (photo.isNotEmpty)
-          Positioned(
-            right: 5,
-            top: 0,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.zero,
-                backgroundColor: Theme.of(
-                  context,
-                ).colorScheme.surfaceContainerHighest,
-                foregroundColor: Theme.of(context).colorScheme.onSurface,
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                minimumSize: Size(screenWidth * 0.06, screenWidth * 0.06),
-              ),
-              onPressed: onDeleteTap,
-              child: const Icon(Icons.clear_outlined),
-            ),
-          ),
       ],
+    );
+  }
+}
+
+// Dolu slotun sağ-üstündeki sil rozeti.
+class _DeleteBadge extends StatelessWidget {
+  const _DeleteBadge({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = MysticTokens.of(context);
+    final scheme = Theme.of(context).colorScheme;
+    return Material(
+      color: scheme.surfaceContainerLowest.withValues(alpha: 0.7),
+      shape: CircleBorder(side: BorderSide(color: tokens.lineStrong)),
+      child: InkWell(
+        customBorder: const CircleBorder(),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(4),
+          child: Icon(Icons.close, size: 16, color: tokens.ink),
+        ),
+      ),
     );
   }
 }

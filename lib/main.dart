@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fortuneapp/core/theme/theme_providers.dart';
 import 'package:fortuneapp/core/utilities/connectivity_service.dart';
 
+import 'core/data/ad_service.dart';
 import 'core/navigation/app_navigator.dart';
 import 'core/navigation/app_router.dart';
 import 'core/widgets/no_internet_dialog.dart';
@@ -13,7 +16,15 @@ import 'firebase_options.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  runApp(const ProviderScope(child: MyApp()));
+  final container = ProviderContainer();
+  // AdMob SDK'sını uygulama açılışında başlat ve reklamları önceden yükle.
+  unawaited(container.read(adServiceProvider).init());
+  runApp(
+    UncontrolledProviderScope(
+      container: container,
+      child: const MyApp(),
+    ),
+  );
 }
 
 // MaterialApp kökü; tema, go_router ve bağlantı katmanını kurar.

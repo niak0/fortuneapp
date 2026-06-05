@@ -6,10 +6,10 @@ import '../../core/auth/current_user.dart';
 import '../../core/navigation/app_navigator.dart';
 import '../../core/theme/mystic_dimens.dart';
 import '../../core/theme/mystic_tokens.dart';
+import '../../core/widgets/section_header.dart';
 import 'model/home_items.dart';
 import 'widgets/build_stream_builder.dart';
 import 'widgets/fortune_card.dart';
-import 'widgets/section_header.dart';
 import 'widgets/sign_up_prompt_banner.dart';
 
 // Anasayfa — son fal balonu + selamlama + mistik fal kategori listesi.
