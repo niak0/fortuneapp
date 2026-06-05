@@ -8,7 +8,8 @@ class Env {
   static const String adMobInterstitialId = String.fromEnvironment(
     'ADMOB_INTERSTITIAL_ID',
   );
-  static const String gptApiKey = String.fromEnvironment('GPT_API_KEY');
+  // Not: GPT API anahtarı artık istemcide DEĞİL — Cloud Function Secret
+  // Manager'da (`GPT_API_KEY`) tutulur. İstemcide yalnızca opsiyonel model adı.
 
   static const String users = String.fromEnvironment(
     'FIREBASE_USERS_COLLECTION',
