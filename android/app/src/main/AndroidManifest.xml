@@ -25,11 +25,11 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <!-- AdMob uygulama kimliği. Şimdilik Google test App ID'si kullanılıyor.
-             Yayına çıkmadan önce AdMob Console'dan alınan gerçek App ID ile değiştir. -->
+        <!-- AdMob uygulama kimliği (gerçek Android App ID). Reklam unit'leri
+             şimdilik AdIds._forceTestAds flag'i ile test ID'sinde tutuluyor. -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3940256099942544~3347511713" />
+            android:value="ca-app-pub-2865767138536274~7580201603" />
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data

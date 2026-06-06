@@ -12,6 +12,11 @@ import 'env.dart';
 class AdIds {
   const AdIds._();
 
+  // true iken (release dahil) tüm reklam unit'leri Google test ID'sinde kalır.
+  // Gerçek reklamları yayınlamaya hazır olunca false yap. App ID native
+  // dosyalarda zaten gerçek değerle ayarlı; bu flag yalnızca unit ID'leri etkiler.
+  static const bool _forceTestAds = true;
+
   // Google resmi test ID'leri (https://developers.google.com/admob).
   static const _testRewardedAndroid = 'ca-app-pub-3940256099942544/5224354917';
   static const _testRewardedIos = 'ca-app-pub-3940256099942544/1712485313';
@@ -22,7 +27,7 @@ class AdIds {
 
   // Ödüllü reklam unit ID'si.
   static String get rewarded {
-    if (kReleaseMode && Env.adMobRewardedId.isNotEmpty) {
+    if (!_forceTestAds && kReleaseMode && Env.adMobRewardedId.isNotEmpty) {
       return Env.adMobRewardedId;
     }
     return Platform.isIOS ? _testRewardedIos : _testRewardedAndroid;
@@ -30,7 +35,7 @@ class AdIds {
 
   // Geçiş (interstitial) reklam unit ID'si.
   static String get interstitial {
-    if (kReleaseMode && Env.adMobInterstitialId.isNotEmpty) {
+    if (!_forceTestAds && kReleaseMode && Env.adMobInterstitialId.isNotEmpty) {
       return Env.adMobInterstitialId;
     }
     return Platform.isIOS ? _testInterstitialIos : _testInterstitialAndroid;

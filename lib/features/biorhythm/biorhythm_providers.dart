@@ -35,6 +35,15 @@ class BiorhythmViewModel extends _$BiorhythmViewModel {
   // 0-100 arası yüzde.
   int percentage(int cycle) => (decimal(cycle) * 100).round();
 
+  // Kritik gün: döngü bir önceki güne göre sıfır çizgisini geçiyorsa (faz
+  // değişimi) o gün kritik kabul edilir — biyoritimin en dikkatli günü.
+  bool isCritical(int cycle) {
+    final days = daysBetween();
+    final today = calculateBiorhythm(days, cycle);
+    final yesterday = calculateBiorhythm(days - 1, cycle);
+    return today == 0 || (today > 0) != (yesterday > 0);
+  }
+
   // Seçili günü değiştirir.
   void setSelectDay(DayItems newDay) {
     if (newDay == state) return;

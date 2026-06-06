@@ -68,20 +68,25 @@ class BiorhythmView extends ConsumerWidget {
                           vm.setSelectDay(newSelection.first),
                     ),
                     Card(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: BiorhythmItems.values
-                            .map(
-                              (item) => buildBiorhythmIndicator(
-                                context,
-                                item.name,
-                                item.color(tokens),
-                                item.icon,
-                                vm.decimal(item.cycle),
-                                vm.percentage(item.cycle),
-                              ),
-                            )
-                            .toList(),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 6),
+                        child: Wrap(
+                          alignment: WrapAlignment.spaceEvenly,
+                          spacing: 8,
+                          runSpacing: 4,
+                          children: BiorhythmItems.values
+                              .map(
+                                (item) => buildBiorhythmIndicator(
+                                  context,
+                                  item.name,
+                                  item.color(tokens),
+                                  item.icon,
+                                  vm.decimal(item.cycle),
+                                  vm.percentage(item.cycle),
+                                ),
+                              )
+                              .toList(),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -89,13 +94,18 @@ class BiorhythmView extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: BiorhythmItems.values.map((item) {
                         final percentage = vm.percentage(item.cycle);
+                        final critical = vm.isCritical(item.cycle);
                         return buildBiorhythmComment(
                           context: context,
                           name: item.name,
-                          comment: item.getComment(percentage),
+                          comment: item.getComment(
+                            percentage,
+                            isCritical: critical,
+                          ),
                           icon: item.icon,
                           color: item.color(tokens),
                           percentage: percentage,
+                          isCritical: critical,
                         );
                       }).toList(),
                     ),
@@ -118,6 +128,7 @@ class BiorhythmView extends ConsumerWidget {
     required IconData icon,
     required Color color,
     required int percentage,
+    required bool isCritical,
   }) {
     return Card(
       child: Column(
@@ -126,6 +137,7 @@ class BiorhythmView extends ConsumerWidget {
           ListTile(
             leading: Icon(icon, color: color),
             title: Text(name, style: Theme.of(context).textTheme.headlineSmall),
+            subtitle: isCritical ? const _CriticalBadge() : null,
             trailing: Text(
               '$percentage/100',
               style: Theme.of(
@@ -205,6 +217,42 @@ class BiorhythmView extends ConsumerWidget {
             ).textTheme.titleLarge?.copyWith(color: color),
           ),
         ],
+      ),
+    );
+  }
+}
+
+// Döngünün sıfır geçişinde gösterilen "kritik gün" uyarı rozeti.
+class _CriticalBadge extends StatelessWidget {
+  const _CriticalBadge();
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Container(
+        margin: const EdgeInsets.only(top: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+        decoration: BoxDecoration(
+          color: scheme.errorContainer,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.warning_amber_rounded,
+                size: 14, color: scheme.onErrorContainer),
+            const SizedBox(width: 4),
+            Text(
+              'Kritik gün',
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: scheme.onErrorContainer,
+                    fontWeight: FontWeight.w600,
+                  ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -1,14 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:fortuneapp/core/theme/mystic_tokens.dart';
 
+// Biyoritim döngüleri: 3 birincil (fiziksel/duygusal/zihinsel) + 3 ikincil.
 enum BiorhythmItems {
   physical("Fiziksel"),
   emotional("Duygusal"),
-  intellectual("Zihinsel");
+  intellectual("Zihinsel"),
+  intuition("Sezgisel"),
+  aesthetic("Estetik"),
+  spiritual("Ruhsal");
 
   final String name;
   const BiorhythmItems(this.name);
 }
+
+// Yorum fazları: her %10 için bir dilim (d0..d9) + sıfır geçişinde kritik gün.
+enum _BioPhase { d0, d1, d2, d3, d4, d5, d6, d7, d8, d9, critical }
 
 extension BiorhythmItemsExtension on BiorhythmItems {
   // Her döngüyü aktif temanın semantik rengine eşler.
@@ -20,6 +27,12 @@ extension BiorhythmItemsExtension on BiorhythmItems {
         return tokens.love;
       case BiorhythmItems.intellectual:
         return tokens.flame;
+      case BiorhythmItems.intuition:
+        return tokens.star;
+      case BiorhythmItems.aesthetic:
+        return tokens.gold;
+      case BiorhythmItems.spiritual:
+        return tokens.halo;
     }
   }
 
@@ -31,9 +44,16 @@ extension BiorhythmItemsExtension on BiorhythmItems {
         return Icons.emoji_emotions_outlined;
       case BiorhythmItems.intellectual:
         return Icons.interests_outlined;
+      case BiorhythmItems.intuition:
+        return Icons.auto_awesome_outlined;
+      case BiorhythmItems.aesthetic:
+        return Icons.palette_outlined;
+      case BiorhythmItems.spiritual:
+        return Icons.self_improvement_outlined;
     }
   }
 
+  // Klasik biyoritim döngü uzunlukları (gün).
   int get cycle {
     switch (this) {
       case BiorhythmItems.physical:
@@ -42,192 +62,244 @@ extension BiorhythmItemsExtension on BiorhythmItems {
         return 28;
       case BiorhythmItems.intellectual:
         return 33;
+      case BiorhythmItems.intuition:
+        return 38;
+      case BiorhythmItems.aesthetic:
+        return 43;
+      case BiorhythmItems.spiritual:
+        return 53;
     }
   }
 
-  String getComment(int percentage) {
-    if (percentage >= 0 && percentage <= 5) {
-      switch (this) {
-        case BiorhythmItems.physical:
-          return "Fiziksel enerjiniz en düşük seviyede. Vücudunuz dinlenmeye ihtiyaç duyuyor olabilir. Bugünü kendinize ayırın ve mümkünse stresten uzak durun. Hafif esneme hareketleri ve derin nefes egzersizleri size iyi gelebilir.";
-        case BiorhythmItems.emotional:
-          return "Duygusal olarak oldukça hassas hissedebilirsiniz. İç dünyanıza dönmek ve duygularınızı anlamak için zaman ayırın. Meditasyon veya günlük tutmak rahatlamanıza yardımcı olabilir.";
-        case BiorhythmItems.intellectual:
-          return "Zihinsel odaklanmanız düşük olabilir. Karmaşık görevlerden kaçınmak ve basit rutinlerle meşgul olmak en iyisi. Beyninize dinlenme fırsatı verin ve kendinizi zorlamayın.";
-      }
-    } else if (percentage > 5 && percentage <= 10) {
-      switch (this) {
-        case BiorhythmItems.physical:
-          return "Enerjiniz yavaş yavaş artıyor ancak hala düşük seviyede. Hafif yürüyüşler veya yumuşak egzersizler yapabilirsiniz. Bol su içmeyi ve dengeli beslenmeyi unutmayın.";
-        case BiorhythmItems.emotional:
-          return "Duygusal dalgalanmalar yaşayabilirsiniz. Sevdiklerinizle vakit geçirmek moralinizi yükseltebilir. Destek almaktan çekinmeyin ve duygularınızı paylaşın.";
-        case BiorhythmItems.intellectual:
-          return "Zihinsel berraklık henüz tam olarak geri dönmedi. Kısa süreli odaklanma gerektiren işleri tercih edin. Notlar almak ve hatırlatıcılar kullanmak faydalı olabilir.";
-      }
-    } else if (percentage > 10 && percentage <= 15) {
-      switch (this) {
-        case BiorhythmItems.physical:
-          return "Fiziksel olarak toparlanma sürecindesiniz. Enerji seviyeniz yükseliyor, ancak kendinizi yormamaya dikkat edin. Dengeli aktiviteler ve iyi bir uyku düzeni size yardımcı olacaktır.";
-        case BiorhythmItems.emotional:
-          return "Duygusal hassasiyet azalmaya başlıyor. İçsel dengeyi bulmak için doğada zaman geçirebilir veya sakinleştirici müzikler dinleyebilirsiniz.";
-        case BiorhythmItems.intellectual:
-          return "Zihinsel kapasiteniz artıyor. Basit planlamalar ve organizasyon işleri için uygun bir zaman. Yeni fikirler not alarak daha sonra değerlendirebilirsiniz.";
-      }
-    } else if (percentage > 15 && percentage <= 20) {
-      switch (this) {
-        case BiorhythmItems.physical:
-          return "Enerjiniz giderek yükseliyor. Hafif tempolu aktiviteler yapmak için ideal bir zaman. Vücudunuzu dinleyin ve sınırlarınızı zorlamamaya özen gösterin.";
-        case BiorhythmItems.emotional:
-          return "Duygusal olarak daha istikrarlısınız. Yaratıcı uğraşlara yönelmek ve hobilerinize zaman ayırmak sizi mutlu edebilir.";
-        case BiorhythmItems.intellectual:
-          return "Zihinsel olarak daha aktifsiniz. Öğrenme ve yeni bilgileri keşfetme isteği duyabilirsiniz. Online kurslar veya ilgi çekici makalelerle zaman geçirebilirsiniz.";
-      }
-    } else if (percentage > 20 && percentage <= 25) {
-      switch (this) {
-        case BiorhythmItems.physical:
-          return "Fiziksel enerjiniz ortalama seviyede. Günlük işlerinizi rahatlıkla yapabilirsiniz. Beslenmenize dikkat ederek enerjinizi daha da artırabilirsiniz.";
-        case BiorhythmItems.emotional:
-          return "Duygusal dengeye yaklaşıyorsunuz. Sosyal etkinlikler ve arkadaş buluşmaları için uygun bir zaman. Paylaşımlarınız size iyi gelecektir.";
-        case BiorhythmItems.intellectual:
-          return "Zihinsel performansınız iyiye gidiyor. Yeni projelere başlamak veya mevcutları ilerletmek için motivasyonunuz yüksek olabilir.";
-      }
-    } else if (percentage > 25 && percentage <= 30) {
-      switch (this) {
-        case BiorhythmItems.physical:
-          return "Enerjiniz artıyor ve kendinizi daha dinç hissediyorsunuz. Düzenli egzersizlerle bu enerjiyi değerlendirebilirsiniz.";
-        case BiorhythmItems.emotional:
-          return "Duygusal olarak rahat ve huzurlu bir dönemdesiniz. Sevdiklerinize zaman ayırmak ve duygusal bağlarınızı güçlendirmek için ideal bir gün.";
-        case BiorhythmItems.intellectual:
-          return "Zihinsel kapasiteniz yükseliyor. Problem çözme ve analiz gerektiren işler için uygun bir zaman. Fikirlerinizi başkalarıyla paylaşabilirsiniz.";
-      }
-    } else if (percentage > 30 && percentage <= 35) {
-      switch (this) {
-        case BiorhythmItems.physical:
-          return "Fiziksel olarak güçleniyorsunuz. Aktif olmak ve hareket etmek sizi daha da enerjik yapacaktır. Açık havada zaman geçirmek iyi bir fikir olabilir.";
-        case BiorhythmItems.emotional:
-          return "Duygusal dengeye sahipsiniz. İç huzurunuz yüksek, bu da çevrenize olumlu yansıyacaktır. Yeni insanlarla tanışmak için güzel bir gün.";
-        case BiorhythmItems.intellectual:
-          return "Zihinsel olarak yaratıcı fikirler üretebilirsiniz. Beyin fırtınası yapmak ve yeni projeler planlamak için harika bir zaman.";
-      }
-    } else if (percentage > 35 && percentage <= 40) {
-      switch (this) {
-        case BiorhythmItems.physical:
-          return "Enerji seviyeniz iyi durumda. Spor yapmak veya fiziksel aktivitelerde bulunmak için motive hissedebilirsiniz.";
-        case BiorhythmItems.emotional:
-          return "Duygusal olarak kendinizi güvende ve mutlu hissediyorsunuz. Sanatsal faaliyetler veya hobilerle ilgilenmek size keyif verecektir.";
-        case BiorhythmItems.intellectual:
-          return "Zihinsel performansınız dengeli. Planlama ve organizasyon işleri için uygun bir dönem. Verimli çalışabilirsiniz.";
-      }
-    } else if (percentage > 40 && percentage <= 45) {
-      switch (this) {
-        case BiorhythmItems.physical:
-          return "Fiziksel enerjiniz yükselmeye devam ediyor. Yeni sporlar denemek veya aktif etkinliklere katılmak için harika bir zaman.";
-        case BiorhythmItems.emotional:
-          return "Duygusal olarak pozitif bir dönemdesiniz. Empati yeteneğiniz yüksek, bu da ilişkilerinizi olumlu etkileyebilir.";
-        case BiorhythmItems.intellectual:
-          return "Zihinsel olarak keskinsiniz. Karmaşık problemleri çözmek ve stratejik düşünmek için ideal bir zaman.";
-      }
-    } else if (percentage > 45 && percentage <= 50) {
-      switch (this) {
-        case BiorhythmItems.physical:
-          return "Enerji seviyeniz oldukça iyi. Uzun vadeli fiziksel hedefler belirlemek için motive hissedebilirsiniz.";
-        case BiorhythmItems.emotional:
-          return "Duygusal denge ve mutluluk hissi yüksek. Sevdiklerinizle derin sohbetler yapmak için güzel bir gün.";
-        case BiorhythmItems.intellectual:
-          return "Zihinsel kapasiteniz yüksek. Öğrenme ve öğretme faaliyetlerinde başarılı olabilirsiniz.";
-      }
-    } else if (percentage > 50 && percentage <= 55) {
-      switch (this) {
-        case BiorhythmItems.physical:
-          return "Fiziksel performansınız iyi seviyede. Enerjinizi yararlı aktivitelere yönlendirmek size fayda sağlayacaktır.";
-        case BiorhythmItems.emotional:
-          return "Duygusal olarak kendinizi ifade etmekte rahat hissediyorsunuz. Yaratıcı projelere katılabilirsiniz.";
-        case BiorhythmItems.intellectual:
-          return "Zihinsel olarak üretkensiniz. Yeni fikirler ve inovasyon için ideal bir zaman.";
-      }
-    } else if (percentage > 55 && percentage <= 60) {
-      switch (this) {
-        case BiorhythmItems.physical:
-          return "Enerjiniz yüksek ve stabil. Fiziksel hedeflerinize ulaşmak için iyi bir motivasyona sahipsiniz.";
-        case BiorhythmItems.emotional:
-          return "Duygusal bağlarınız güçleniyor. Aile ve arkadaşlarla vakit geçirmek size iyi gelecektir.";
-        case BiorhythmItems.intellectual:
-          return "Zihinsel berraklık üst düzeyde. Zor görevleri kolaylıkla tamamlayabilirsiniz.";
-      }
-    } else if (percentage > 60 && percentage <= 65) {
-      switch (this) {
-        case BiorhythmItems.physical:
-          return "Fiziksel olarak kendinizi harika hissediyorsunuz. Yeni spor hedefleri belirlemek için ideal bir zaman.";
-        case BiorhythmItems.emotional:
-          return "Duygusal enerjiniz yüksek. Sevgi ve şefkat duygularınız artıyor, bu da ilişkilerinizi olumlu etkiliyor.";
-        case BiorhythmItems.intellectual:
-          return "Zihinsel kapasiteniz zirveye yaklaşıyor. Stratejik planlar ve önemli kararlar için uygun bir dönem.";
-      }
-    } else if (percentage > 65 && percentage <= 70) {
-      switch (this) {
-        case BiorhythmItems.physical:
-          return "Enerjiniz doruk noktasına yaklaşıyor. Fiziksel aktivitelerde performansınız artıyor. Kendinizi aşmaya hazır hissedebilirsiniz.";
-        case BiorhythmItems.emotional:
-          return "Duygusal olarak çok olumlusunuz. İnsanlarla kolayca bağlantı kurabilir ve yeni dostluklar edinebilirsiniz.";
-        case BiorhythmItems.intellectual:
-          return "Zihinsel olarak çok aktifsiniz. Karmaşık projelere odaklanmak ve yenilikçi çözümler bulmak için harika bir zaman.";
-      }
-    } else if (percentage > 70 && percentage <= 75) {
-      switch (this) {
-        case BiorhythmItems.physical:
-          return "Fiziksel performansınız yüksek. Spor ve egzersizlerden büyük keyif alabilirsiniz. Enerjinizi olumlu yönde kullanın.";
-        case BiorhythmItems.emotional:
-          return "Duygusal enerjiniz zirvede. Sevgi ve mutluluk dolu bir dönemdesiniz. Sevdiklerinize zaman ayırın.";
-        case BiorhythmItems.intellectual:
-          return "Zihinsel kapasiteniz çok yüksek. Yeni şeyler öğrenmek ve öğretmek için mükemmel bir zaman.";
-      }
-    } else if (percentage > 75 && percentage <= 80) {
-      switch (this) {
-        case BiorhythmItems.physical:
-          return "Enerjiniz en üst seviyelere ulaşıyor. Fiziksel sınırlarınızı zorlamak isteyebilirsiniz, ancak dikkatli olun ve vücudunuzu dinleyin.";
-        case BiorhythmItems.emotional:
-          return "Duygusal olarak harika hissediyorsunuz. Pozitif enerjiniz çevrenizdekilere de yansıyacaktır.";
-        case BiorhythmItems.intellectual:
-          return "Zihinsel olarak zirvedesiniz. Karmaşık sorunları çözmek ve yaratıcı fikirler üretmek için ideal bir zaman.";
-      }
-    } else if (percentage > 80 && percentage <= 85) {
-      switch (this) {
-        case BiorhythmItems.physical:
-          return "Fiziksel olarak mükemmel hissediyorsunuz. Uzun süreli fiziksel aktiviteler için enerjiniz yüksek.";
-        case BiorhythmItems.emotional:
-          return "Duygusal enerjiniz çok yüksek. İlişkilerinizde derinleşme ve yeni başlangıçlar için uygun bir zaman.";
-        case BiorhythmItems.intellectual:
-          return "Zihinsel performansınız mükemmel. Liderlik ve yönlendirme gerektiren görevlerde başarılı olabilirsiniz.";
-      }
-    } else if (percentage > 85 && percentage <= 90) {
-      switch (this) {
-        case BiorhythmItems.physical:
-          return "Enerjiniz dorukta! Fiziksel aktivitelerde üstün performans gösterebilirsiniz. Ancak dinlenmeyi ihmal etmeyin.";
-        case BiorhythmItems.emotional:
-          return "Duygusal olarak çok güçlüsünüz. Sevdiklerinizle derin bağlar kurmak için harika bir zaman.";
-        case BiorhythmItems.intellectual:
-          return "Zihinsel olarak olağanüstü bir dönemdesiniz. Büyük fikirler ve projeler için mükemmel bir zaman.";
-      }
-    } else if (percentage > 90 && percentage <= 95) {
-      switch (this) {
-        case BiorhythmItems.physical:
-          return "Fiziksel enerjiniz en üst seviyede. Kendinizi yenilmez hissedebilirsiniz, ancak aşırıya kaçmamaya dikkat edin.";
-        case BiorhythmItems.emotional:
-          return "Duygusal olarak en üst noktadasınız. Sevgi ve mutluluk sizi çevreliyor. Bu enerjiyi başkalarıyla paylaşın.";
-        case BiorhythmItems.intellectual:
-          return "Zihinsel kapasiteniz zirvede. En karmaşık görevleri bile kolaylıkla halledebilirsiniz.";
-      }
-    } else if (percentage > 95 && percentage <= 100) {
-      switch (this) {
-        case BiorhythmItems.physical:
-          return "Fiziksel olarak en güçlü döneminizi yaşıyorsunuz. Enerjinizi büyük hedeflere yönlendirmek için harika bir zaman.";
-        case BiorhythmItems.emotional:
-          return "Duygusal enerjiniz zirvede! Sevgi dolu ve mutlu bir ruh hali içindesiniz. Bu olumlu enerjiyi etrafınıza yayabilirsiniz.";
-        case BiorhythmItems.intellectual:
-          return "Zihinsel performansınız en üst seviyede. Yaratıcılığınız ve keskin zekânızla büyük işler başarabilirsiniz.";
-      }
-    } else {
-      return "Bilinmeyen bir değer girdiniz. Lütfen yüzdeyi 0 ile 100 arasında bir değer olarak girin.";
-    }
+  // Yüzde (0-100) + kritik bilgisinden %10'luk dilimi seçer.
+  _BioPhase _phase(int percentage, bool isCritical) {
+    if (isCritical) return _BioPhase.critical;
+    if (percentage <= 10) return _BioPhase.d0;
+    if (percentage <= 20) return _BioPhase.d1;
+    if (percentage <= 30) return _BioPhase.d2;
+    if (percentage <= 40) return _BioPhase.d3;
+    if (percentage <= 50) return _BioPhase.d4;
+    if (percentage <= 60) return _BioPhase.d5;
+    if (percentage <= 70) return _BioPhase.d6;
+    if (percentage <= 80) return _BioPhase.d7;
+    if (percentage <= 90) return _BioPhase.d8;
+    return _BioPhase.d9;
+  }
+
+  // Seçili güne ait yüzde ve kritik bilgisine göre zengin Türkçe yorum.
+  String getComment(int percentage, {bool isCritical = false}) {
+    return _comments[this]![_phase(percentage, isCritical)]!;
   }
 }
+
+// Döngü × dilim (%10) bazlı yorum metinleri (kritik gün dahil).
+const Map<BiorhythmItems, Map<_BioPhase, String>> _comments = {
+  BiorhythmItems.physical: {
+    _BioPhase.d0:
+        'Fiziksel enerjin dibe vurmuş; bedenin tam dinlenme istiyor. Bugünü '
+        'kendine ayır, ağır her şeyi ertele.',
+    _BioPhase.d1:
+        'Enerjin çok düşük, çabuk yoruluyorsun. Bol uyku, su ve hafif '
+        'beslenmeyle toparlanmaya odaklan.',
+    _BioPhase.d2:
+        'Bedenin yavaşça canlanıyor ama hâlâ kırılgan. Kısa, hafif yürüyüşler '
+        'iyi gelir; kendini zorlama.',
+    _BioPhase.d3:
+        'Toparlanma sürecindesin, enerji geri geliyor. Orta tempolu işler '
+        'yapabilirsin, sınırını koru.',
+    _BioPhase.d4:
+        'Fiziksel durumun ortalamaya yaklaşıyor. Günlük rutinini rahat '
+        'yürütürsün, dengeli kal.',
+    _BioPhase.d5:
+        'Enerjin ortanın üstünde, kendini fena hissetmiyorsun. Düzenli '
+        'hareketle bu ivmeyi büyüt.',
+    _BioPhase.d6:
+        'Bedenin iyi durumda ve dinç. Spor ve aktif uğraşlardan keyif '
+        'alacağın verimli bir gün.',
+    _BioPhase.d7:
+        'Fiziksel performansın yüksek. Daha zorlu antrenman ve aktiviteler '
+        'için motivasyonun tam.',
+    _BioPhase.d8:
+        'Enerjin çok yüksek, kendini güçlü hissediyorsun. Büyük fiziksel '
+        'hedeflere yüklenmenin tam zamanı.',
+    _BioPhase.d9:
+        'Fiziksel olarak zirvedesin; dayanıklılığın tavanda. Enerjini '
+        'değerlendir ama aşırıya kaçma.',
+    _BioPhase.critical:
+        'Fiziksel ritmin bugün kritik geçiş gününde — bedenin dengesiz '
+        'olabilir. Riskli ve zorlayıcı işleri ertele, temkinli ol.',
+  },
+  BiorhythmItems.emotional: {
+    _BioPhase.d0:
+        'Duyguların en hassas noktada; her şey büyük gelebilir. Kendine '
+        'şefkat göster, sakin bir köşeye çekil.',
+    _BioPhase.d1:
+        'Moralin düşük ve kırılgansın. Sevdiklerinin desteği ve nazik bir '
+        'ortam iyi gelecek.',
+    _BioPhase.d2:
+        'Duygusal dalgalanmalar azalıyor ama hâlâ değişkensin. Hislerini '
+        'paylaşmak rahatlatır.',
+    _BioPhase.d3:
+        'Ruh halin yavaşça düzeliyor. Küçük keyifler ve hobiler moralini '
+        'yukarı taşır.',
+    _BioPhase.d4:
+        'Duygusal dengeye yaklaşıyorsun. Sosyal temas ve içten sohbetler '
+        'bugün iyi gelir.',
+    _BioPhase.d5:
+        'Moralin ortanın üstünde, daha istikrarlısın. İlişkilerine zaman '
+        'ayırmak için uygun bir gün.',
+    _BioPhase.d6:
+        'Duygusal enerjin iyi; empatin açık. Bağlarını derinleştirmek için '
+        'verimli bir gün.',
+    _BioPhase.d7:
+        'Moralin yüksek, çevrene olumlu yansıyorsun. Yeni dostluklar ve '
+        'paylaşımlar için harika.',
+    _BioPhase.d8:
+        'Duygusal enerjin çok yüksek; sevgi ve coşku dolusun. Bu havayı '
+        'sevdiklerinle paylaş.',
+    _BioPhase.d9:
+        'Duygusal olarak zirvedesin; içten bir mutluluk yayıyorsun. '
+        'İlişkilerinde derinleşmenin tam zamanı.',
+    _BioPhase.critical:
+        'Duygusal ritmin kritik gününde — ani ruh hali değişimleri olabilir. '
+        'Önemli kararları ve tartışmaları bugün erteleyebilirsin.',
+  },
+  BiorhythmItems.intellectual: {
+    _BioPhase.d0:
+        'Zihinsel enerjin dipte; odaklanmak çok zor. Karmaşık işleri bırak, '
+        'beynine tam mola ver.',
+    _BioPhase.d1:
+        'Konsantrasyonun çok düşük, dikkatin dağınık. Basit ve rutin işlerle '
+        'günü geçir.',
+    _BioPhase.d2:
+        'Zihnin yavaş açılıyor. Kısa odak blokları ve notlarla küçük işleri '
+        'toparlayabilirsin.',
+    _BioPhase.d3:
+        'Berraklık geri geliyor. Planlama ve hafif analitik işler için uygun '
+        'bir aralık.',
+    _BioPhase.d4:
+        'Zihinsel durumun ortalamaya yakın. Günlük kararları rahat alır, '
+        'organize olursun.',
+    _BioPhase.d5:
+        'Odak ve kavrayışın ortanın üstünde. Yeni bilgi öğrenmek için iyi bir '
+        'gün.',
+    _BioPhase.d6:
+        'Zihnin keskin; analiz ve problem çözme akıcı. Önemli işlere '
+        'girebilirsin.',
+    _BioPhase.d7:
+        'Zihinsel performansın yüksek. Stratejik kararlar ve yaratıcı '
+        'çözümler için verimli.',
+    _BioPhase.d8:
+        'Kavrayışın çok yüksek; zor konuları kolayca çözüyorsun. Büyük '
+        'projelere odaklan.',
+    _BioPhase.d9:
+        'Zihinsel olarak zirvedesin; zekân ve yaratıcılığın tavanda. En çetin '
+        'işlere şimdi gir.',
+    _BioPhase.critical:
+        'Zihinsel ritmin kritik gününde — dikkat dağınıklığı ve hatalar '
+        'olası. Önemli kararları ve detayları iki kez kontrol et.',
+  },
+  BiorhythmItems.intuition: {
+    _BioPhase.d0:
+        'Sezgilerin tamamen sönük; içsesin susmuş. Kararları kesinlikle somut '
+        'verilere bırak.',
+    _BioPhase.d1:
+        'Önsezilerin çok zayıf, yanıltıcı olabilir. İçgüdüsel hamlelerden '
+        'kaçın.',
+    _BioPhase.d2:
+        'Sezgisel algın düşük. Acele etme, gözlem yaparak ilerle.',
+    _BioPhase.d3:
+        'İçsesin yavaş netleşiyor. İçgüdülerini mantıkla teyit ederek kullan.',
+    _BioPhase.d4:
+        'Sezgilerin ortalamaya yaklaşıyor. Hislerine kulak ver ama tek başına '
+        'güvenme.',
+    _BioPhase.d5:
+        'Sezgilerin ortanın üstünde, daha isabetli. Küçük seziş anlarına '
+        'dikkat et.',
+    _BioPhase.d6:
+        'İçgüdülerin iyi çalışıyor. Zamanlama ve insan okuma konusunda bugün '
+        'şanslısın.',
+    _BioPhase.d7:
+        'Sezgilerin güçlü ve doğru. İlk hislerine güvenmek genelde işe '
+        'yarayacak.',
+    _BioPhase.d8:
+        'Önsezilerin çok keskin; fırsatları önceden hissediyorsun. İçsesini '
+        'ciddiye al.',
+    _BioPhase.d9:
+        'Sezgisel olarak zirvedesin; ilk hislerin neredeyse hep doğru. '
+        'İçgüdüne güvenle hareket et.',
+    _BioPhase.critical:
+        'Sezgisel ritmin kritik gününde — içgüdülerin yanıltıcı olabilir. '
+        'Bugün önsezilere değil somut bilgiye dayan.',
+  },
+  BiorhythmItems.aesthetic: {
+    _BioPhase.d0:
+        'Yaratıcı kıvılcımın tükenmiş; ilham yok. Üretmeye çalışma, dinlen ve '
+        'basit zevklere sığın.',
+    _BioPhase.d1:
+        'Estetik algın çok düşük. Yeni iş yerine var olanı sadeleştirmek daha '
+        'iyi.',
+    _BioPhase.d2:
+        'Yaratıcılığın yavaş canlanıyor. Küçük düzenlemeler ve toparlama '
+        'işleri uygun.',
+    _BioPhase.d3:
+        'İlham geri geliyor. Hafif yaratıcı dokunuşlar ve düzenlemeler '
+        'yapabilirsin.',
+    _BioPhase.d4:
+        'Estetik duyun ortalamaya yakın. Ortamını güzelleştirecek küçük işler '
+        'iyi gider.',
+    _BioPhase.d5:
+        'Yaratıcı enerjin ortanın üstünde. Müzik, sanat ve tasarımla '
+        'ilgilenmek keyif verir.',
+    _BioPhase.d6:
+        'Estetik algın iyi; güzeli kolay yakalıyorsun. Tasarım ve ifade için '
+        'verimli bir gün.',
+    _BioPhase.d7:
+        'Yaratıcılığın yüksek. Sanatsal projeler ve görsel kararlar için '
+        'motivasyonun tam.',
+    _BioPhase.d8:
+        'İlhamın çok güçlü; fikirler akıyor. Yaratıcı işlere ve estetik '
+        'seçimlere yüklen.',
+    _BioPhase.d9:
+        'Estetik olarak zirvedesin; ilham seni buluyor. Büyük yaratıcı işler '
+        'için mükemmel zaman.',
+    _BioPhase.critical:
+        'Estetik ritmin kritik gününde — zevk ve uyum algın dengesiz olabilir. '
+        'Önemli görsel/tasarım kararlarını erteleyebilirsin.',
+  },
+  BiorhythmItems.spiritual: {
+    _BioPhase.d0:
+        'Ruhsal enerjin dipte; iç huzur uzak görünüyor. Sessizlik, doğa ve '
+        'nefes egzersizleriyle yavaşla.',
+    _BioPhase.d1:
+        'İçsel dinginliğin çok kırılgan. Yargılamadan dinlen, kendini '
+        'zorlama.',
+    _BioPhase.d2:
+        'Ruhun yavaş yatışıyor. Küçük şükran anları ve sade ritüeller dengeni '
+        'besler.',
+    _BioPhase.d3:
+        'İç huzurun geri geliyor. Kısa meditasyon ve içe dönük anlar iyi '
+        'gelir.',
+    _BioPhase.d4:
+        'Ruhsal dengen ortalamaya yaklaşıyor. Sakin bir gün; farkındalık '
+        'pratiklerine açıksın.',
+    _BioPhase.d5:
+        'İç dinginliğin ortanın üstünde. Anlam arayışına zaman ayırmak için '
+        'uygun.',
+    _BioPhase.d6:
+        'Ruhsal farkındalığın iyi. Manevi pratiklerin ve içsel sorguların '
+        'bugün derinleşir.',
+    _BioPhase.d7:
+        'İç huzurun yüksek; berraksın. Sezgisel-manevi içgörüler için verimli '
+        'bir dönem.',
+    _BioPhase.d8:
+        'Ruhsal enerjin çok yüksek; derin bir denge içindesin. Bu huzuru '
+        'çevrene de yansıt.',
+    _BioPhase.d9:
+        'Ruhsal olarak zirvedesin; sükûnet ve berraklık tavanda. İçsel '
+        'bilgeliğini kararlarına taşı.',
+    _BioPhase.critical:
+        'Ruhsal ritmin kritik gününde — iç dengen oynak olabilir. Kendini '
+        'zorlamadan, sabırla akışta kal.',
+  },
+};
