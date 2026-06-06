@@ -42,7 +42,7 @@ final class FortuneDreamViewModelProvider
 }
 
 String _$fortuneDreamViewModelHash() =>
-    r'406f27821a27b2952ecac8e1d187c0aa5703e7d0';
+    r'8513b9d7802f9f4ca5727b97e77b5bd34e0320fa';
 
 abstract class _$FortuneDreamViewModel extends $Notifier<FortuneDreamState> {
   FortuneDreamState build();

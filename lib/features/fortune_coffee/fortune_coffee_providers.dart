@@ -8,7 +8,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../core/data/fortune_repository.dart';
 import '../../core/models/user_model.dart';
-import '../../core/network/gpt_service.dart';
 import '../../core/network/prompt_builder.dart';
 import '../../core/ui/ui_helper.dart';
 import '../../core/utilities/gold_manager.dart';
@@ -26,7 +25,7 @@ class FortuneCoffeeViewModel extends _$FortuneCoffeeViewModel {
 
   bool handleFortuneCreation() => state.isValid;
 
-  // GPT'den kahve falı alır, kaydeder ve altını düşer. Başarılıysa true döner.
+  // Bekleyen kahve falı oluşturur; vision yorumu arka planda üretilir.
   Future<bool> getFortuneAndSaveFirebase(UserModel currentUser) async {
     final topic = state.selectedFortuneTopic;
     if (topic == null) return false;
@@ -38,40 +37,28 @@ class FortuneCoffeeViewModel extends _$FortuneCoffeeViewModel {
       return false;
     }
 
-    final prompt =
-        '${buildUserContext(currentUser)}. Fal konusu: ${topic.displayName}. '
-        'Ekteki fincan fotoğraflarındaki sembolleri yorumlayarak görsele dayalı '
-        'sembolik bir kahve falı yap.';
-
-    // Dolu fotoğraf slot'larını base64'e çevir (vision için).
+    // Dolu fotoğraf slot'larını base64'e çevir (vision payload, pending doc'a).
     final images = await _encodePhotos();
 
-    final text = await ref
-        .read(gptServiceProvider)
-        .createMessage(
-          message: prompt,
-          contentType: ContentType.coffee,
-          fortuneTopic: topic,
-          images: images,
-        );
-    if (text == null) {
-      ui.showSnackBar('Fal alınamadı, lütfen tekrar dene');
-      return false;
-    }
-
+    await gold.decreaseGold(kFortuneCost);
     final ok = await ref
         .read(fortuneRepositoryProvider)
-        .add(
-          content: text,
+        .create(
           contentType: ContentType.coffee,
           fortuneTopic: topic,
+          request: {
+            'userContext': buildUserContext(currentUser),
+            'topicLabel': topic.displayName,
+            'images': images,
+          },
         );
     if (!ok) {
-      ui.showSnackBar('Fal kaydedilemedi');
+      await gold.increaseGold(amount: kFortuneCost);
+      ui.showSnackBar('Fal başlatılamadı, lütfen tekrar dene');
       return false;
     }
 
-    await gold.decreaseGold(kFortuneCost);
+    ui.showSnackBar('Falın hazırlanıyor, birazdan hazır olacak ✨');
     return true;
   }
 
@@ -89,10 +76,12 @@ class FortuneCoffeeViewModel extends _$FortuneCoffeeViewModel {
   // Galeriden foto seçer ve slot'u günceller (vision maliyeti için küçültülür).
   Future<void> pickPhoto(int index) async {
     final picker = ImagePicker();
+    // Küçült: 3 base64 görsel Firestore 1MB doc limitine sığmalı; vision
+    // detail:"low" zaten 512px kullandığı için kalite kaybı önemsiz.
     final image = await picker.pickImage(
       source: ImageSource.gallery,
-      maxWidth: 1024,
-      imageQuality: 70,
+      maxWidth: 768,
+      imageQuality: 55,
     );
     if (image == null) return;
     final newPhotos = List<String>.from(state.photos);

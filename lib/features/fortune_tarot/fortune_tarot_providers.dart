@@ -8,7 +8,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../core/auth/current_user.dart';
 import '../../core/data/fortune_repository.dart';
-import '../../core/network/gpt_service.dart';
 import '../../core/network/prompt_builder.dart';
 import '../../core/ui/ui_helper.dart';
 import '../../core/utilities/gold_manager.dart';
@@ -65,7 +64,7 @@ class FortuneTarotViewModel extends _$FortuneTarotViewModel {
     state = AsyncData(current.copyWith(selectedCards: updated));
   }
 
-  // Seçilen kartlardan GPT yorumu alır, kaydeder ve altını düşer.
+  // Seçilen kartlardan bekleyen bir fal oluşturur; yorum arka planda üretilir.
   Future<bool> handleSelectedCards() async {
     final current = state.value;
     final cards = current?.cards;
@@ -85,27 +84,22 @@ class FortuneTarotViewModel extends _$FortuneTarotViewModel {
         .where((e) => e.value != null)
         .map((e) => '${e.key}: ${cards[e.value!].name}')
         .join(', ');
-    final prompt =
-        '${buildUserContext(user)}. Seçilen tarot kartları -> $selected. '
-        'Bu üç kartlık (geçmiş-şimdi-gelecek) açılımı yorumla.';
 
-    final text = await ref
-        .read(gptServiceProvider)
-        .createMessage(message: prompt, contentType: ContentType.tarot);
-    if (text == null) {
-      ui.showSnackBar('Fal alınamadı, lütfen tekrar dene');
-      return false;
-    }
-
+    // Altını şimdi düş; üretim Cloud Function'da arka planda yapılacak.
+    await gold.decreaseGold(kFortuneCost);
     final ok = await ref
         .read(fortuneRepositoryProvider)
-        .add(content: text, contentType: ContentType.tarot);
+        .create(
+          contentType: ContentType.tarot,
+          request: {'userContext': buildUserContext(user), 'cards': selected},
+        );
     if (!ok) {
-      ui.showSnackBar('Fal kaydedilemedi');
+      await gold.increaseGold(amount: kFortuneCost);
+      ui.showSnackBar('Fal başlatılamadı, lütfen tekrar dene');
       return false;
     }
 
-    await gold.decreaseGold(kFortuneCost);
+    ui.showSnackBar('Falın hazırlanıyor, birazdan hazır olacak ✨');
     return true;
   }
 }

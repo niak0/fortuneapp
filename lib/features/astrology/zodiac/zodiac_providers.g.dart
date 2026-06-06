@@ -33,7 +33,7 @@ final class ZodiacViewModelProvider
   ZodiacViewModel create() => ZodiacViewModel();
 }
 
-String _$zodiacViewModelHash() => r'7a3dbc4298b4bff9435a487332887f2c28637716';
+String _$zodiacViewModelHash() => r'397e7350768961c5d1a9791fba5476db632cb67b';
 
 abstract class _$ZodiacViewModel extends $AsyncNotifier<ZodiacState> {
   FutureOr<ZodiacState> build();

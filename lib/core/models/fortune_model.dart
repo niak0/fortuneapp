@@ -24,6 +24,10 @@ class FortuneModel {
   String? fortune;
   String? userId;
 
+  // Üretim durumu: 'pending' (hazırlanıyor) | 'ready' (hazır) | 'error'.
+  // Eski kayıtlarda null olabilir; bu durumda fortune doluysa hazır sayılır.
+  String? status;
+
   @ContentTypeConverter()
   ContentType? fortuneType;
 
@@ -39,11 +43,22 @@ class FortuneModel {
     this.unlockTime,
     this.fortune,
     this.userId,
+    this.status,
     this.fortuneType,
     this.fortuneTopic,
     this.isRead = false,
     this.isAccessible = false,
   });
+
+  // Fal henüz arka planda üretiliyor.
+  bool get isPending => status == 'pending';
+
+  // Üretim başarısız oldu (altın iade edilir).
+  bool get isErrored => status == 'error';
+
+  // Hazır: status 'ready' ya da eski kayıt (status yok ama metin dolu).
+  bool get isReady =>
+      status == 'ready' || (status == null && (fortune?.isNotEmpty ?? false));
 
   factory FortuneModel.fromJson(Map<String, dynamic> json) =>
       _$FortuneModelFromJson(json);
@@ -56,6 +71,7 @@ class FortuneModel {
     DateTime? unlockTime,
     String? fortune,
     String? userId,
+    String? status,
     ContentType? fortuneType,
     FortuneTopic? fortuneTopic,
     bool? isRead,
@@ -67,6 +83,7 @@ class FortuneModel {
       unlockTime: unlockTime ?? this.unlockTime,
       fortune: fortune ?? this.fortune,
       userId: userId ?? this.userId,
+      status: status ?? this.status,
       fortuneType: fortuneType ?? this.fortuneType,
       fortuneTopic: fortuneTopic ?? this.fortuneTopic,
       isRead: isRead ?? this.isRead,

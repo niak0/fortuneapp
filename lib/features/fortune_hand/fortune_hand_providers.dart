@@ -4,7 +4,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../core/auth/current_user.dart';
 import '../../core/data/fortune_repository.dart';
-import '../../core/network/gpt_service.dart';
 import '../../core/network/prompt_builder.dart';
 import '../../core/ui/ui_helper.dart';
 import '../../core/utilities/gold_manager.dart';
@@ -27,7 +26,7 @@ class FortuneHandViewModel extends _$FortuneHandViewModel {
     state = state.copyWith(photoPath: image.path);
   }
 
-  // GPT'den el falı yorumu alır, kaydeder ve altını düşer. Başarılıysa true.
+  // Bekleyen el falı kaydı oluşturur; yorum arka planda üretilir.
   Future<bool> submit() async {
     if (!state.hasPhoto) return false;
 
@@ -41,27 +40,20 @@ class FortuneHandViewModel extends _$FortuneHandViewModel {
       return false;
     }
 
-    final prompt =
-        '${buildUserContext(user)}. Kullanıcı avuç içi fotoğrafını paylaştı; '
-        'el çizgilerine dayalı sembolik bir el falı yorumu yap.';
-
-    final text = await ref
-        .read(gptServiceProvider)
-        .createMessage(message: prompt, contentType: ContentType.hand);
-    if (text == null) {
-      ui.showSnackBar('Fal alınamadı, lütfen tekrar dene');
-      return false;
-    }
-
+    await gold.decreaseGold(kFortuneCost);
     final ok = await ref
         .read(fortuneRepositoryProvider)
-        .add(content: text, contentType: ContentType.hand);
+        .create(
+          contentType: ContentType.hand,
+          request: {'userContext': buildUserContext(user)},
+        );
     if (!ok) {
-      ui.showSnackBar('Fal kaydedilemedi');
+      await gold.increaseGold(amount: kFortuneCost);
+      ui.showSnackBar('Fal başlatılamadı, lütfen tekrar dene');
       return false;
     }
 
-    await gold.decreaseGold(kFortuneCost);
+    ui.showSnackBar('Falın hazırlanıyor, birazdan hazır olacak ✨');
     return true;
   }
 }

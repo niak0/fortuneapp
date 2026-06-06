@@ -42,7 +42,7 @@ final class FortuneHandViewModelProvider
 }
 
 String _$fortuneHandViewModelHash() =>
-    r'6bc102438c18777d8214e2c3c1053f9595d0595f';
+    r'6be65bbbc51ac0c60e96987d963ea667333fc012';
 
 abstract class _$FortuneHandViewModel extends $Notifier<FortuneHandState> {
   FortuneHandState build();

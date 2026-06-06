@@ -3,7 +3,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../core/auth/current_user.dart';
 import '../../core/data/fortune_repository.dart';
-import '../../core/network/gpt_service.dart';
 import '../../core/network/prompt_builder.dart';
 import '../../core/ui/ui_helper.dart';
 import '../../core/utilities/gold_manager.dart';
@@ -24,7 +23,7 @@ class FortuneDreamViewModel extends _$FortuneDreamViewModel {
     state = state.copyWith(dreamText: value);
   }
 
-  // GPT'den rüya yorumu alır, kaydeder ve altını düşer. Başarılıysa true döner.
+  // Bekleyen rüya tabiri kaydı oluşturur; yorum arka planda üretilir.
   Future<bool> submit() async {
     if (!state.isValid) return false;
 
@@ -38,27 +37,23 @@ class FortuneDreamViewModel extends _$FortuneDreamViewModel {
       return false;
     }
 
-    final prompt =
-        '${buildUserContext(user)}. Görülen rüya: ${state.dreamText.trim()}. '
-        'Bu rüyayı sembolik ve derin bir şekilde yorumla.';
-
-    final text = await ref
-        .read(gptServiceProvider)
-        .createMessage(message: prompt, contentType: ContentType.dream);
-    if (text == null) {
-      ui.showSnackBar('Fal alınamadı, lütfen tekrar dene');
-      return false;
-    }
-
+    await gold.decreaseGold(kFortuneCost);
     final ok = await ref
         .read(fortuneRepositoryProvider)
-        .add(content: text, contentType: ContentType.dream);
+        .create(
+          contentType: ContentType.dream,
+          request: {
+            'userContext': buildUserContext(user),
+            'dreamText': state.dreamText.trim(),
+          },
+        );
     if (!ok) {
-      ui.showSnackBar('Fal kaydedilemedi');
+      await gold.increaseGold(amount: kFortuneCost);
+      ui.showSnackBar('Fal başlatılamadı, lütfen tekrar dene');
       return false;
     }
 
-    await gold.decreaseGold(kFortuneCost);
+    ui.showSnackBar('Falın hazırlanıyor, birazdan hazır olacak ✨');
     return true;
   }
 }

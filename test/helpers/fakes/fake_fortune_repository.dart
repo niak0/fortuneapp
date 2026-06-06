@@ -13,9 +13,15 @@ class FakeFortuneRepository implements FortuneRepository {
   final List<FortuneModel> _items;
   final _controller = StreamController<List<FortuneModel>>.broadcast();
 
-  // Eklenen falları test'te doğrulamak için kayıt tutar.
-  final List<({ContentType contentType, FortuneTopic? fortuneTopic})> addCalls =
-      [];
+  // Oluşturulan pending falları test'te doğrulamak için kayıt tutar.
+  final List<
+    ({
+      ContentType contentType,
+      FortuneTopic? fortuneTopic,
+      Map<String, dynamic> request,
+    })
+  >
+  createCalls = [];
 
   @override
   Stream<List<FortuneModel>> watchAll() {
@@ -27,12 +33,27 @@ class FakeFortuneRepository implements FortuneRepository {
   Future<List<FortuneModel>> fetchAll() async => List.of(_items);
 
   @override
-  Future<bool> add({
-    required String content,
+  Future<bool> create({
     required ContentType contentType,
+    required Map<String, dynamic> request,
     FortuneTopic? fortuneTopic,
   }) async {
-    addCalls.add((contentType: contentType, fortuneTopic: fortuneTopic));
+    createCalls.add((
+      contentType: contentType,
+      fortuneTopic: fortuneTopic,
+      request: request,
+    ));
+    _items.insert(
+      0,
+      FortuneModel(
+        id: 'fake-${_items.length}',
+        status: 'pending',
+        fortuneType: contentType,
+        fortuneTopic: fortuneTopic,
+        isAccessible: false,
+      ),
+    );
+    _controller.add(List.of(_items));
     return true;
   }
 

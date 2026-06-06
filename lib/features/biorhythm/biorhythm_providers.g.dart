@@ -59,7 +59,7 @@ final class BiorhythmViewModelProvider
 }
 
 String _$biorhythmViewModelHash() =>
-    r'f4adc26d1d6240962d5f572b8adeaa02e87ed50f';
+    r'51647901b9ee103060bd661abc0baa448c7e6065';
 
 final class BiorhythmViewModelFamily extends $Family
     with

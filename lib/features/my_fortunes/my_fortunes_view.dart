@@ -30,10 +30,10 @@ class MyFortunesView extends ConsumerWidget {
             itemCount: fortunes.length,
             itemBuilder: (context, index) {
               final fortune = fortunes[index];
-              final isAccessible = fortune.isAccessible ?? false;
+              // Sadece hazır fallar açılabilir; pending/error tıklanamaz.
               return _FortuneTile(
                 fortune: fortune,
-                onTap: isAccessible
+                onTap: fortune.isReady
                     ? () async {
                         if (!(fortune.isRead ?? false)) {
                           await notifier.markAsRead(fortune.id!);
@@ -65,26 +65,49 @@ class _FortuneTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = MysticTokens.of(context);
+    final scheme = Theme.of(context).colorScheme;
     final isRead = fortune.isRead ?? false;
-    final isAccessible = fortune.isAccessible ?? false;
+    final isReady = fortune.isReady;
+    final isErrored = fortune.isErrored;
+
+    // Duruma göre satır sonu ikonu: hazır → ok, hata → uyarı, pending → kum saati.
+    final IconData trailingIcon;
+    final Color trailingColor;
+    if (isErrored) {
+      trailingIcon = Icons.error_outline;
+      trailingColor = scheme.error;
+    } else if (isReady) {
+      trailingIcon = Icons.chevron_right_outlined;
+      trailingColor = tokens.gold;
+    } else {
+      trailingIcon = Icons.timelapse_outlined;
+      trailingColor = tokens.inkFaint;
+    }
+
+    // Alt başlık: hazır → tarih, hata → iade mesajı, pending → hazırlanıyor.
+    final String subtitle;
+    if (isErrored) {
+      subtitle = '${fortune.formattedDate} • Fal alınamadı, altının iade edildi';
+    } else if (isReady) {
+      subtitle = fortune.formattedDate;
+    } else {
+      subtitle = '${fortune.formattedDate} • Hazırlanıyor...';
+    }
 
     return Card(
       child: ListTile(
-        // Okunmamış fallar altın çizgi ile vurgulanır.
+        // Okunmamış hazır fallar altın çizgi ile vurgulanır.
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
-          side: BorderSide(color: isRead ? tokens.line : tokens.gold),
+          side: BorderSide(
+            color: isReady && !isRead ? tokens.gold : tokens.line,
+          ),
         ),
         leading: Icon(
           fortune.fortuneType?.icon ?? Icons.auto_awesome_outlined,
           color: tokens.gold,
         ),
-        trailing: Icon(
-          isAccessible
-              ? Icons.chevron_right_outlined
-              : Icons.timelapse_outlined,
-          color: isAccessible ? tokens.gold : tokens.inkFaint,
-        ),
+        trailing: Icon(trailingIcon, color: trailingColor),
         title: Row(
           children: [
             Flexible(
@@ -101,9 +124,7 @@ class _FortuneTile extends StatelessWidget {
           ],
         ),
         subtitle: Text(
-          isAccessible
-              ? fortune.formattedDate
-              : '${fortune.formattedDate} • Yorumlanıyor...',
+          subtitle,
           style: Theme.of(context).textTheme.bodySmall,
         ),
         onTap: onTap,

@@ -11,9 +11,13 @@ part 'fortune_repository.g.dart';
 abstract class FortuneRepository {
   Stream<List<FortuneModel>> watchAll();
   Future<List<FortuneModel>> fetchAll();
-  Future<bool> add({
-    required String content,
+
+  // Bekleyen (pending) bir fal kaydı oluşturur; GPT yorumu Cloud Function
+  // tarafından arka planda üretilip kayda yazılır. [request] fal tipine özgü
+  // yapısal veridir (userContext, cards, topicLabel, dreamText, images).
+  Future<bool> create({
     required ContentType contentType,
+    required Map<String, dynamic> request,
     FortuneTopic? fortuneTopic,
   });
   Future<void> setAccess(String fortuneId);

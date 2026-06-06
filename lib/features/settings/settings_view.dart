@@ -15,6 +15,10 @@ class SettingsView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final settingsAsync = ref.watch(settingsViewModelProvider);
     final notifier = ref.read(settingsViewModelProvider.notifier);
+    // Anon kullanıcıda çıkış/hesap silme anlamsız; bu durumu izle.
+    final isAnon = ref.watch(
+      authProvider.select((u) => u?.isAnonymous ?? false),
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -51,31 +55,34 @@ class SettingsView extends ConsumerWidget {
               const SizedBox(height: 12),
               const _ThemePicker(),
               const SizedBox(height: 12),
-              Card(
-                child: ListTile(
-                  title: const Text('Çıkış Yap'),
-                  trailing: const Icon(Icons.arrow_forward_ios),
-                  onTap: () async {
-                    await ref.read(authProvider.notifier).signOut();
-                    // Bootstrap yeni anon login yapar; home'a düş.
-                    if (context.mounted) {
-                      ref
-                          .read(appNavigatorProvider)
-                          .pushAndRemoveUntil(AppRoutes.home);
-                    }
-                  },
-                ),
-              ),
-              TextButton(
-                onPressed: () => _showDeleteAccountDialog(context, ref),
-                child: Text(
-                  'Hesabımı Sil',
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.error,
-                    fontSize: 16,
+              // Çıkış/hesap silme sadece giriş yapmış (anon olmayan) kullanıcıda.
+              if (!isAnon) ...[
+                Card(
+                  child: ListTile(
+                    title: const Text('Çıkış Yap'),
+                    trailing: const Icon(Icons.arrow_forward_ios),
+                    onTap: () async {
+                      await ref.read(authProvider.notifier).signOut();
+                      // Bootstrap yeni anon login yapar; home'a düş.
+                      if (context.mounted) {
+                        ref
+                            .read(appNavigatorProvider)
+                            .pushAndRemoveUntil(AppRoutes.home);
+                      }
+                    },
                   ),
                 ),
-              ),
+                TextButton(
+                  onPressed: () => _showDeleteAccountDialog(context, ref),
+                  child: Text(
+                    'Hesabımı Sil',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.error,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+              ],
               const SizedBox(height: 10),
               const Text('Fortune App v1', textAlign: TextAlign.center),
             ],

@@ -54,29 +54,32 @@ class FirestoreFortuneRepository implements FortuneRepository {
   }
 
   @override
-  Future<bool> add({
-    required String content,
+  Future<bool> create({
     required ContentType contentType,
+    required Map<String, dynamic> request,
     FortuneTopic? fortuneTopic,
   }) async {
     final coll = _coll();
     if (coll == null) return false;
     try {
       final now = DateTime.now();
+      // 'pending' yazılır; Cloud Function trigger'ı fortune+status'ü doldurur.
       await coll.add({
-        'fortune': content,
+        'status': 'pending',
+        'fortune': null,
         'fortuneType': contentType.name,
         'fortuneTopic': fortuneTopic?.name,
+        'request': request,
         'createdTime': Timestamp.fromDate(now),
         'unlockTime': Timestamp.fromDate(now),
         'isRead': false,
-        'isAccessible': true,
+        'isAccessible': false,
         'userId': _auth.currentUser?.uid,
       });
-      developer.log('fortune eklendi', name: _logName);
+      developer.log('pending fortune eklendi', name: _logName);
       return true;
     } catch (e, s) {
-      developer.log('add HATA', name: _logName, error: e, stackTrace: s);
+      developer.log('create HATA', name: _logName, error: e, stackTrace: s);
       return false;
     }
   }

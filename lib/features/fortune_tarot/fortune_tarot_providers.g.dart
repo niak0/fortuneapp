@@ -34,7 +34,7 @@ final class FortuneTarotViewModelProvider
 }
 
 String _$fortuneTarotViewModelHash() =>
-    r'c446a35391c4839e31dacd5ada11e356acfab5c4';
+    r'8f0d517eed36ecaa93c580e7e24850c51126a791';
 
 abstract class _$FortuneTarotViewModel
     extends $AsyncNotifier<FortuneTarotState> {

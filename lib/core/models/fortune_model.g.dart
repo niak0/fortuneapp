@@ -11,6 +11,7 @@ FortuneModel _$FortuneModelFromJson(Map<String, dynamic> json) => FortuneModel(
   unlockTime: const TimestampConverter().fromJson(json['unlockTime']),
   fortune: json['fortune'] as String?,
   userId: json['userId'] as String?,
+  status: json['status'] as String?,
   fortuneType: const ContentTypeConverter().fromJson(
     json['fortuneType'] as String?,
   ),
@@ -28,6 +29,7 @@ Map<String, dynamic> _$FortuneModelToJson(
   'unlockTime': const TimestampConverter().toJson(instance.unlockTime),
   'fortune': instance.fortune,
   'userId': instance.userId,
+  'status': instance.status,
   'fortuneType': const ContentTypeConverter().toJson(instance.fortuneType),
   'fortuneTopic': const FortuneTopicConverter().toJson(instance.fortuneTopic),
   'isRead': instance.isRead,
