@@ -11,16 +11,19 @@ class FakeGptService implements GptService {
   int callCount = 0;
   String? lastMessage;
   ContentType? lastContentType;
+  List<String>? lastImages;
 
   @override
   Future<String?> createMessage({
     required String message,
     required ContentType contentType,
     FortuneTopic? fortuneTopic,
+    List<String>? images,
   }) async {
     callCount++;
     lastMessage = message;
     lastContentType = contentType;
+    lastImages = images;
     return reply;
   }
 }

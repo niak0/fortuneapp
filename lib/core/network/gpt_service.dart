@@ -16,6 +16,7 @@ abstract class GptService {
     required String message,
     required ContentType contentType,
     FortuneTopic? fortuneTopic,
+    List<String>? images,
   });
 }
 
@@ -35,6 +36,7 @@ class FunctionsGptService implements GptService {
     required String message,
     required ContentType contentType,
     FortuneTopic? fortuneTopic,
+    List<String>? images,
   }) async {
     try {
       final callable = _functions.httpsCallable('generateFortune');
@@ -42,6 +44,7 @@ class FunctionsGptService implements GptService {
         'system': contentType.systemMessageContent,
         'user': message,
         if (model != null && model!.isNotEmpty) 'model': model,
+        if (images != null && images.isNotEmpty) 'images': images,
       });
       final text = result.data['text'];
       if (text is String && text.isNotEmpty) return text;

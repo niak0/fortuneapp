@@ -33,7 +33,7 @@ final class BuyGoldViewModelProvider
   BuyGoldViewModel create() => BuyGoldViewModel();
 }
 
-String _$buyGoldViewModelHash() => r'096b1c8588efe5401e32119c555f6fea2261a9af';
+String _$buyGoldViewModelHash() => r'849ecb11ba3a7a7973fb9407aa4796cae03aa3ce';
 
 abstract class _$BuyGoldViewModel extends $AsyncNotifier<void> {
   FutureOr<void> build();

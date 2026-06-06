@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:fortuneapp/enums/fortune_topic.dart';
 import 'package:fortuneapp/enums/gpt_content_type.dart';
 import 'package:image_picker/image_picker.dart';
@@ -37,8 +40,11 @@ class FortuneCoffeeViewModel extends _$FortuneCoffeeViewModel {
 
     final prompt =
         '${buildUserContext(currentUser)}. Fal konusu: ${topic.displayName}. '
-        'Kullanıcı fincan fotoğraflarını paylaştı; görsele dayalı sembolik bir '
-        'kahve falı yorumu yap.';
+        'Ekteki fincan fotoğraflarındaki sembolleri yorumlayarak görsele dayalı '
+        'sembolik bir kahve falı yap.';
+
+    // Dolu fotoğraf slot'larını base64'e çevir (vision için).
+    final images = await _encodePhotos();
 
     final text = await ref
         .read(gptServiceProvider)
@@ -46,6 +52,7 @@ class FortuneCoffeeViewModel extends _$FortuneCoffeeViewModel {
           message: prompt,
           contentType: ContentType.coffee,
           fortuneTopic: topic,
+          images: images,
         );
     if (text == null) {
       ui.showSnackBar('Fal alınamadı, lütfen tekrar dene');
@@ -68,10 +75,25 @@ class FortuneCoffeeViewModel extends _$FortuneCoffeeViewModel {
     return true;
   }
 
-  // Galeriden foto seçer ve slot'u günceller.
+  // Dolu fotoğraf slot'larını okuyup base64 listesine çevirir (vision payload).
+  Future<List<String>> _encodePhotos() async {
+    final images = <String>[];
+    for (final path in state.photos) {
+      if (path.isEmpty) continue;
+      final bytes = await File(path).readAsBytes();
+      images.add(base64Encode(bytes));
+    }
+    return images;
+  }
+
+  // Galeriden foto seçer ve slot'u günceller (vision maliyeti için küçültülür).
   Future<void> pickPhoto(int index) async {
     final picker = ImagePicker();
-    final image = await picker.pickImage(source: ImageSource.gallery);
+    final image = await picker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 1024,
+      imageQuality: 70,
+    );
     if (image == null) return;
     final newPhotos = List<String>.from(state.photos);
     newPhotos[index] = image.path;

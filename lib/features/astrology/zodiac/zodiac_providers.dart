@@ -18,7 +18,7 @@ class ZodiacViewModel extends _$ZodiacViewModel {
     return ZodiacState(
       zodiacModels: models,
       selectedZodiac: models.isNotEmpty ? models.first : null,
-      selectedSegment: ZodiacSegments.week,
+      selectedSegment: ZodiacSegments.day,
     );
   }
 

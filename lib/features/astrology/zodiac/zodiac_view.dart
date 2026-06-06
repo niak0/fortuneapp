@@ -207,11 +207,13 @@ class ZodiacSegmented extends ConsumerWidget {
   }
 }
 
-enum ZodiacSegments { week, month, year }
+enum ZodiacSegments { day, week, month, year }
 
 extension ZodiacSegmentsExtension on ZodiacSegments {
   String get displayName {
     switch (this) {
+      case ZodiacSegments.day:
+        return 'Bugün';
       case ZodiacSegments.week:
         return 'Haftalık';
       case ZodiacSegments.month:

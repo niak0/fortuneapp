@@ -48,10 +48,8 @@ class ZodiacModel {
 
   String getComment(ZodiacSegments segment) {
     switch (segment) {
-      // case ZodiacSegments.yesterday:
-      //   return commentYesterday;
-      // case ZodiacSegments.day:
-      //   return commentDaily;
+      case ZodiacSegments.day:
+        return commentDaily;
       case ZodiacSegments.week:
         return commentWeekly;
       case ZodiacSegments.month:
